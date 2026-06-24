@@ -1151,18 +1151,10 @@ make logs db    # docker compose logs -f odoo-postgres
 - **XML**: Indentasi 4 spasi, komentar section separator (`═══`)
 - **CSS**: BEM-like naming untuk custom classes, Tailwind utilities untuk inline styling
 
----
 
-## 📄 Lisensi
-
-Proyek ini dilisensikan di bawah [LGPL-3.0](https://www.gnu.org/licenses/lgpl-3.0.html).
-
----
 
 <div align="center">
 
-**Dibangun dengan ❤️ menggunakan Odoo 19**
-
-[Catalog](http://localhost:8069/catalog) · [Admin](http://localhost:8069/admin/dashboard) · [API](http://localhost:8069/api/books)
+**Copyright © 2026 - All right reserved by ILHAM TATAYO LIE**
 
 </div>
