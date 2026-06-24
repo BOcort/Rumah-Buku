@@ -341,10 +341,9 @@
                 <t t-foreach="books" t-as="book">
                     <a t-attf-href="/book/{{book.id}}" class="group">
                         <article class="warm-paper rounded-xl soft-shadow overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-outline-variant/30 h-full">
-                            <div class="relative aspect-[3/4] bg-surface-container flex items-center justify-center overflow-hidden">
-                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" t-att-src="book.cover_display_url" t-att-alt="book.name"/>
-                                <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"
-                                     t-attf-class="{{ 'bg-[#dcfce7] text-[#166534]' if book.status == 'available' else 'bg-red-100 text-red-700' }}">
+                            <div class="relative aspect-[3/4] w-full bg-surface-variant overflow-hidden">
+                                <img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" t-att-src="book.cover_display_url" t-att-alt="book.name" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 50 50\'%3E%3Cpath fill=\'%23012425\' d=\'M25,5A20.14,20.14,0,0,1,45,22.88a2.51,2.51,0,0,0,2.49,2.26h0A2.52,2.52,0,0,0,50,22.33a25.14,25.14,0,0,0-50,0,2.52,2.52,0,0,0,2.5,2.81h0A2.51,2.51,0,0,0,5,22.88,20.14,20.14,0,0,1,25,5Z\'%3E%3CanimateTransform attributeName=\'transform\' type=\'rotate\' from=\'0 25 25\' to=\'360 25 25\' dur=\'0.8s\' repeatCount=\'indefinite\'/%3E%3C/path%3E%3C/svg%3E'; this.classList.remove('object-cover'); this.classList.add('object-contain', 'p-10', 'opacity-40');"/>
+                                <div t-attf-class="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm z-10 {{ 'bg-[#dcfce7] text-[#166534]' if book.status == 'available' else 'bg-red-100 text-red-700' }}">
                                     <t t-esc="book.status"/>
                                 </div>
                             </div>

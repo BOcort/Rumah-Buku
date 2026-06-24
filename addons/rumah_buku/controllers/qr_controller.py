@@ -19,11 +19,12 @@ class QRController(http.Controller):
         """Generate QR code image for a transaction."""
         tx = request.env['rumah_buku.transaction'].sudo().browse(transaction_id)
         if not tx.exists():
-            return request.make_response(
+            response = request.make_response(
                 json.dumps({'error': 'Transaction not found'}),
-                status=404,
                 headers=[('Content-Type', 'application/json')]
             )
+            response.status_code = 404
+            return response
 
         token = tx.qr_code_token or 'no-token'
 
@@ -55,27 +56,32 @@ class QRController(http.Controller):
     def verify_qr(self, **kwargs):
         """Admin verifies QR token — confirms book pickup."""
         try:
-            data = json.loads(request.httprequest.data)
+            raw_data = request.httprequest.get_data(as_text=True)
+            data = json.loads(raw_data) if raw_data else {}
             token = data.get('token', '').strip()
 
             if not token:
-                return request.make_response(
+                response = request.make_response(
                     json.dumps({'error': 'Token is required'}),
-                    status=400,
                     headers=[('Content-Type', 'application/json')]
                 )
+                response.status_code = 400
+                return response
 
-            # Find transactions with this token
-            transactions = request.env['rumah_buku.transaction'].sudo().search([
-                ('qr_code_token', '=', token),
-            ])
+            # Find transactions with this token or book name
+            domain = [
+                ('status', 'in', ['ready_for_pickup', 'borrowed']),
+                '|', ('qr_code_token', '=', token), ('book_id.name', 'ilike', token)
+            ]
+            transactions = request.env['rumah_buku.transaction'].sudo().search(domain, order='create_date desc', limit=1)
 
             if not transactions:
-                return request.make_response(
-                    json.dumps({'error': 'Token QR tidak ditemukan'}),
-                    status=404,
+                response = request.make_response(
+                    json.dumps({'error': 'Token QR atau Buku tidak ditemukan (Atau belum siap dipickup)'}),
                     headers=[('Content-Type', 'application/json')]
                 )
+                response.status_code = 404
+                return response
 
             # Get transaction details
             tx = transactions[0]
@@ -102,26 +108,29 @@ class QRController(http.Controller):
             )
 
         except Exception as e:
-            return request.make_response(
+            response = request.make_response(
                 json.dumps({'error': str(e)}),
-                status=400,
                 headers=[('Content-Type', 'application/json')]
             )
+            response.status_code = 400
+            return response
 
     @http.route('/api/qr/confirm-pickup', type='http', auth='user',
                 methods=['POST'], csrf=False)
     def confirm_pickup(self, **kwargs):
         """Admin confirms pickup — changes status to 'borrowed', sets dates."""
         try:
-            data = json.loads(request.httprequest.data)
+            raw_data = request.httprequest.get_data(as_text=True)
+            data = json.loads(raw_data) if raw_data else {}
             token = data.get('token', '').strip()
 
             if not token:
-                return request.make_response(
+                response = request.make_response(
                     json.dumps({'error': 'Token is required'}),
-                    status=400,
                     headers=[('Content-Type', 'application/json')]
                 )
+                response.status_code = 400
+                return response
 
             service = request.env['rumah_buku.transaction_service'].sudo()
             transaction = service.confirm_pickup(token)
@@ -137,8 +146,9 @@ class QRController(http.Controller):
             )
 
         except Exception as e:
-            return request.make_response(
+            response = request.make_response(
                 json.dumps({'error': str(e)}),
-                status=400,
                 headers=[('Content-Type', 'application/json')]
             )
+            response.status_code = 400
+            return response

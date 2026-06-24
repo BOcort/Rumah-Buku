@@ -2,39 +2,45 @@ from odoo import http, _
 from odoo.http import request
 from odoo.addons.web.controllers.home import Home
 import werkzeug
+import json
 
-class AuthController(Home):
-    @http.route('/web/login', type='http', auth="none", s2s=False, csrf=False)
-    def web_login(self, redirect=None, **kw):
-        request.params['login_success'] = False
-        if request.httprequest.method == 'GET' and redirect and request.session.uid:
-            return request.redirect(redirect)
 
-        if not request.uid:
-            request.update_env(user=request.env.ref('base.public_user').id)
+class AuthController(http.Controller):
 
-        values = {
-            'error': "",
-            'redirect': redirect,
-        }
+    # ─── Custom Web Login & Signup (Separate from native Odoo) ───────────────
+    @http.route('/app/login', type='http', auth="public", website=True, csrf=False)
+    def app_login(self, **kw):
+        # If already logged in, show success page directly
+        if request.session.uid and request.env.user.login != 'public':
+            return request.render('rumah_buku.frontend_login_success', {'name': request.env.user.name})
 
+        values = {'error': ""}
+        
         if request.httprequest.method == 'POST':
-            old_uid = request.uid
+            login = kw.get('login')
+            password = kw.get('password')
             try:
-                uid = request.session.authenticate(request.session.db, request.params['login'], request.params['password'])
-                request.params['login_success'] = True
-                return request.redirect(self._login_redirect(uid, redirect=redirect))
+                # Authenticate
+                uid = request.env['res.users'].authenticate(request.session.db, login, password, None)
+                if uid:
+                    request.session.uid = uid
+                    request.session.login = login
+                    request.session.session_token = uid
+                    user = request.env['res.users'].sudo().browse(uid)
+                    # Show the 5-second countdown page instead of instant redirect
+                    return request.render('rumah_buku.frontend_login_success', {'name': user.name})
+                else:
+                    values['error'] = _("Wrong login/password")
             except Exception as e:
                 values['error'] = _("Wrong login/password")
                 
         return request.render('rumah_buku.frontend_login', values)
         
-    @http.route('/web/signup', type='http', auth='public', website=True, s2s=False, csrf=False)
-    def web_signup(self, *args, **kw):
+    @http.route('/app/signup', type='http', auth='public', website=True, csrf=False)
+    def app_signup(self, **kw):
         values = {'error': ''}
         if request.httprequest.method == 'POST':
             try:
-                # Basic signup implementation
                 name = kw.get('name')
                 login = kw.get('login')
                 password = kw.get('password')
@@ -44,16 +50,126 @@ class AuthController(Home):
                     values['error'] = _("Passwords do not match.")
                     return request.render('rumah_buku.frontend_register', values)
                 
+                # Create user
                 request.env['res.users'].sudo().create({
                     'name': name,
                     'login': login,
                     'password': password,
-                    'groups_id': [(6, 0, [request.env.ref('base.group_portal').id])]
+                    'share': True
                 })
-                # Authenticate after signup
-                request.session.authenticate(request.session.db, login, password)
-                return request.redirect('/catalog')
+                
+                # Authenticate and show success page
+                uid = request.env['res.users'].authenticate(request.session.db, login, password, None)
+                if uid:
+                    request.session.uid = uid
+                    request.session.login = login
+                    request.session.session_token = uid
+                    return request.render('rumah_buku.frontend_login_success', {'name': name})
             except Exception as e:
                 values['error'] = str(e)
                 
         return request.render('rumah_buku.frontend_register', values)
+
+    # ─── JSON API Login (for Postman / external clients) ─────────────────────
+    @http.route('/api/auth/login', type='http', auth='none', methods=['POST'], csrf=False)
+    def api_login(self, **kwargs):
+        """
+        JSON API login endpoint for Postman / REST clients.
+        Body: {"db": "odoo_development", "login": "admin@email.com", "password": "admin#123"}
+        Returns session_id cookie + user info.
+        """
+        try:
+            raw_data = request.httprequest.get_data(as_text=True)
+            if not raw_data:
+                response = request.make_response(
+                    json.dumps({'error': 'Request body is empty. Send JSON with db, login, password.'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+                response.status_code = 400
+                return response
+
+            data = json.loads(raw_data)
+            db = data.get('db', 'odoo_development')
+            login = data.get('login', '')
+            password = data.get('password', '')
+
+            if not login or not password:
+                response = request.make_response(
+                    json.dumps({'error': 'login and password are required'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+                response.status_code = 400
+                return response
+
+            # Use direct model authentication
+            uid = request.env['res.users'].authenticate(db, login, password, None)
+            
+            if not uid:
+                response = request.make_response(
+                    json.dumps({'error': 'Invalid credentials'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+                response.status_code = 401
+                return response
+                
+            # Manually set up session for API
+            request.session.db = db
+            request.session.uid = uid
+            request.session.login = login
+            request.session.session_token = uid
+
+
+            user = request.env['res.users'].sudo().browse(uid)
+            result = {
+                'status': 'success',
+                'uid': uid,
+                'session_id': request.session.sid,
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'is_admin': user.has_group('base.group_system'),
+                },
+            }
+            return request.make_response(
+                json.dumps(result),
+                headers=[('Content-Type', 'application/json')]
+            )
+
+        except Exception as e:
+            response = request.make_response(
+                json.dumps({'error': str(e)}),
+                headers=[('Content-Type', 'application/json')]
+            )
+            response.status_code = 400
+            return response
+
+    @http.route('/api/auth/logout', type='http', auth='user', methods=['POST'], csrf=False)
+    def api_logout(self, **kwargs):
+        """JSON API logout."""
+        request.session.logout(keep_db=True)
+        return request.make_response(
+            json.dumps({'status': 'success', 'message': 'Logged out'}),
+            headers=[('Content-Type', 'application/json')]
+        )
+
+    @http.route('/api/auth/me', type='http', auth='user', methods=['GET'], csrf=False)
+    def api_me(self, **kwargs):
+        """Get current session user info."""
+        user = request.env.user
+        result = {
+            'status': 'success',
+            'user': {
+                'id': user.id,
+                'name': user.name,
+                'login': user.login,
+                'is_admin': user.has_group('base.group_system'),
+                'phone_number': user.phone_number if hasattr(user, 'phone_number') else '',
+                'role': user.role if hasattr(user, 'role') else 'user',
+                'is_suspended': user.is_suspended if hasattr(user, 'is_suspended') else False,
+            }
+        }
+        return request.make_response(
+            json.dumps(result),
+            headers=[('Content-Type', 'application/json')]
+        )

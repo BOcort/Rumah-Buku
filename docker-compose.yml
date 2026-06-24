@@ -11,6 +11,7 @@ services:
       - ./etc/odoo:/etc/odoo
       - ./addons:/mnt/extra-addons
       - ./var/lib/odoo:/var/lib/odoo
+    command: odoo --dev=all
 
     networks:
       - odoo-network
@@ -22,11 +23,15 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /var/lib/postgresql/data/pgdata:/var/lib/postgresql/data/pgdata
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
     networks:
       - odoo-network
     
-  
+
 networks:
   odoo-network:
     driver: bridge
+
+volumes:
+  odoo-db-data:
+

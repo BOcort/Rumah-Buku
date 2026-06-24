@@ -2,6 +2,18 @@
 <odoo>
     <data noupdate="1">
         <!-- ═══════════════════════════════════════════════════════
+             Transaction Sequence
+             ═══════════════════════════════════════════════════════ -->
+        <record id="seq_transaction" model="ir.sequence">
+            <field name="name">Rumah Buku Transaction</field>
+            <field name="code">rumah_buku.transaction</field>
+            <field name="prefix">RB/TX/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════
              SEED DATA — Sample Books (15 books)
              ═══════════════════════════════════════════════════════ -->
         <record id="book_01" model="rumah_buku.book">

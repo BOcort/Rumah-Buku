@@ -66,11 +66,12 @@ class BookController(http.Controller):
         """API: Get single book detail."""
         book = request.env['rumah_buku.book'].sudo().browse(book_id)
         if not book.exists():
-            return request.make_response(
+            response = request.make_response(
                 json.dumps({'error': 'Not Found'}),
-                status=404,
                 headers=[('Content-Type', 'application/json')]
             )
+            response.status_code = 404
+            return response
 
         data = {
             'id': book.id,
@@ -99,14 +100,24 @@ class BookController(http.Controller):
     def create_book(self, **kwargs):
         """API: Create a new book (admin only)."""
         if not request.env.user.has_group('base.group_system'):
-            return request.make_response(
+            response = request.make_response(
                 json.dumps({'error': 'Forbidden'}),
-                status=403,
                 headers=[('Content-Type', 'application/json')]
             )
+            response.status_code = 403
+            return response
 
         try:
-            data = json.loads(request.httprequest.data)
+            raw_data = request.httprequest.get_data(as_text=True)
+            if not raw_data:
+                response = request.make_response(
+                    json.dumps({'error': 'Request body is empty. Send JSON payload.'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+                response.status_code = 400
+                return response
+
+            data = json.loads(raw_data)
             book = request.env['rumah_buku.book'].sudo().create({
                 'name': data.get('name'),
                 'author': data.get('author'),
@@ -126,9 +137,17 @@ class BookController(http.Controller):
                 json.dumps({'status': 'success', 'id': book.id, 'message': 'Book created successfully'}),
                 headers=[('Content-Type', 'application/json')]
             )
-        except Exception as e:
-            return request.make_response(
-                json.dumps({'error': str(e)}),
-                status=400,
+        except json.JSONDecodeError:
+            response = request.make_response(
+                json.dumps({'error': 'Invalid JSON in request body'}),
                 headers=[('Content-Type', 'application/json')]
             )
+            response.status_code = 400
+            return response
+        except Exception as e:
+            response = request.make_response(
+                json.dumps({'error': str(e)}),
+                headers=[('Content-Type', 'application/json')]
+            )
+            response.status_code = 400
+            return response

@@ -87,10 +87,11 @@ class Transaction(models.Model):
             else:
                 tx.is_overdue = False
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code(
-                'rumah_buku.transaction'
-            ) or 'New'
-        return super(Transaction, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code(
+                    'rumah_buku.transaction'
+                ) or 'New'
+        return super(Transaction, self).create(vals_list)

@@ -11,9 +11,8 @@
         - Keanggotaan Bulanan
         - Notifikasi real-time
         - Admin Portal: Dashboard, Inventory, Users, Transactions, Financial, QR Scanner
-        - API Backend & UI Frontend terintegrasi
     """,
-    'author': 'Antigravity',
+    'author': 'Ilham Lie',
     'category': 'Sales/Rumah Buku',
     'depends': ['base', 'web', 'mail'],
     'data': [

@@ -5,9 +5,18 @@ import json
 class PaymentController(http.Controller):
     @http.route('/api/payments/webhook', type='http', auth='public', methods=['POST'], csrf=False)
     def midtrans_webhook(self, **post):
-        # Basic skeleton for Midtrans webhook
+        """Mock Midtrans webhook for payment status updates."""
         try:
-            data = json.loads(request.httprequest.data)
+            raw_data = request.httprequest.get_data(as_text=True)
+            if not raw_data:
+                response = request.make_response(
+                    json.dumps({'error': 'Request body is empty'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+                response.status_code = 400
+                return response
+
+            data = json.loads(raw_data)
             order_id = data.get('order_id')
             transaction_status = data.get('transaction_status')
             
@@ -18,6 +27,14 @@ class PaymentController(http.Controller):
                 elif transaction_status in ['cancel', 'deny', 'expire']:
                     payment.status = 'cancel'
                     
-            return request.make_response(json.dumps({'status': 'ok'}), headers=[('Content-Type', 'application/json')])
+            return request.make_response(
+                json.dumps({'status': 'ok'}),
+                headers=[('Content-Type', 'application/json')]
+            )
         except Exception as e:
-            return request.make_response(json.dumps({'error': str(e)}), status=400, headers=[('Content-Type', 'application/json')])
+            response = request.make_response(
+                json.dumps({'error': str(e)}),
+                headers=[('Content-Type', 'application/json')]
+            )
+            response.status_code = 400
+            return response
