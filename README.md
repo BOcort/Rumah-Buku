@@ -1151,7 +1151,7 @@ make logs db    # docker compose logs -f odoo-postgres
 - **XML**: Indentasi 4 spasi, komentar section separator (`═══`)
 - **CSS**: BEM-like naming untuk custom classes, Tailwind utilities untuk inline styling
 
-
+---
 
 <div align="center">
 
