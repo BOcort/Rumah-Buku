@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══════════════════════════════════════════════════════════
+         BOOK DETAIL PAGE
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_book_detail" name="Book Detail">
+        <t t-call="rumah_buku.frontend_layout">
+            <div class="flex flex-col gap-12">
+                <!-- Breadcrumb -->
+                <nav class="flex items-center gap-2 text-sm text-on-surface-variant">
+                    <a href="/catalog" class="hover:text-primary transition-colors">Catalog</a>
+                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    <span class="text-on-surface font-medium truncate max-w-[200px]"><t t-esc="book.name"/></span>
+                </nav>
+
+                <!-- Book Details Section -->
+                <section class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                    <!-- Left: Book Cover -->
+                    <div class="md:col-span-4 lg:col-span-3 flex justify-center md:justify-start">
+                        <div class="relative w-64 md:w-full aspect-[2/3] rounded-xl shadow-lg overflow-hidden bg-surface-variant border border-outline-variant/20">
+                            <img t-att-src="book.cover_display_url" class="w-full h-full object-cover" t-att-alt="book.name"/>
+                        </div>
+                    </div>
+
+                    <!-- Right: Details & Actions -->
+                    <div class="md:col-span-8 lg:col-span-9 flex flex-col gap-5">
+                        <!-- Status & Category -->
+                        <div class="flex items-center gap-3">
+                            <span t-if="book.status == 'available'" class="inline-flex items-center px-2.5 py-1 rounded-full bg-[#dcfce7] text-[#166534] text-xs font-bold uppercase tracking-wider">
+                                <span class="material-symbols-outlined text-[14px] mr-1">check_circle</span> Available
+                            </span>
+                            <span t-if="book.status != 'available'" class="inline-flex items-center px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider">
+                                <span class="material-symbols-outlined text-[14px] mr-1">cancel</span> <t t-esc="book.status"/>
+                            </span>
+                            <span t-if="book.category" class="text-on-surface-variant text-xs uppercase tracking-widest font-medium bg-surface-variant px-2.5 py-1 rounded-full">
+                                <t t-esc="dict(book._fields['category'].selection).get(book.category, book.category)"/>
+                            </span>
+                        </div>
+
+                        <!-- Title & Author -->
+                        <div>
+                            <h1 class="text-3xl md:text-4xl font-headline-md text-on-surface mb-2"><t t-esc="book.name"/></h1>
+                            <p class="text-lg text-on-surface-variant">by <span class="text-primary font-medium"><t t-esc="book.author"/></span></p>
+                        </div>
+
+                        <!-- Synopsis -->
+                        <div class="prose max-w-none text-on-surface-variant leading-relaxed text-sm">
+                            <p><t t-esc="book.synopsis or 'No synopsis available.'"/></p>
+                        </div>
+
+                        <!-- Price Display -->
+                        <div class="flex items-baseline gap-4 py-3">
+                            <t t-if="book.sell_price > 0">
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-sm text-on-surface-variant">Buy:</span>
+                                    <span class="text-2xl font-headline-md text-primary">Rp <t t-esc="'{:,.0f}'.format(book.sell_price)"/></span>
+                                </div>
+                            </t>
+                            <t t-if="book.is_rentable">
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-sm text-on-surface-variant">Rent:</span>
+                                    <span class="text-xl font-headline-md text-on-surface">Rp <t t-esc="'{:,.0f}'.format(book.rent_price_per_day)"/>/hari</span>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap gap-3 pt-3 border-t border-surface-variant">
+                            <t t-if="book.is_rentable">
+                                <form action="/cart/add" method="POST" class="flex-1 md:flex-none">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="book_id" t-att-value="book.id"/>
+                                    <input type="hidden" name="action_type" value="borrow"/>
+                                    <button type="submit" t-att-disabled="book.status != 'available' or book.stock &lt;= 0" class="w-full bg-primary text-on-primary font-semibold px-6 py-3 rounded-lg hover:bg-primary-container transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+                                        <span class="material-symbols-outlined text-[20px]">menu_book</span> Rent for 10 Days
+                                    </button>
+                                </form>
+                            </t>
+                            <t t-if="book.sell_price > 0">
+                                <form action="/cart/add" method="POST" class="flex-1 md:flex-none">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="book_id" t-att-value="book.id"/>
+                                    <input type="hidden" name="action_type" value="buy"/>
+                                    <button type="submit" t-att-disabled="book.status != 'available' or book.stock &lt;= 0" class="w-full bg-[#D97706] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#B45309] transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+                                        <span class="material-symbols-outlined text-[20px]">shopping_bag</span> Buy Now
+                                    </button>
+                                </form>
+                            </t>
+                        </div>
+
+                        <!-- Metadata Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-5 pt-5 mt-2 bg-[#FDFBF7] p-6 rounded-xl border border-outline-variant/20">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">ISBN</span>
+                                <span class="text-sm text-on-surface"><t t-esc="book.isbn or '-'"/></span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Publisher</span>
+                                <span class="text-sm text-on-surface"><t t-esc="book.publisher or '-'"/></span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Year</span>
+                                <span class="text-sm text-on-surface"><t t-esc="book.publication_year or '-'"/></span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Pages</span>
+                                <span class="text-sm text-on-surface"><t t-esc="book.pages or '-'"/></span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Stock</span>
+                                <span class="text-sm text-on-surface font-medium"><t t-esc="book.stock"/> available</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Location</span>
+                                <span class="text-sm text-on-surface font-medium flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px] text-primary">location_on</span>
+                                    <t t-esc="book.location_rack or '-'"/>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Similar Books -->
+                <t t-if="similar_books">
+                    <section class="mt-4">
+                        <h2 class="text-2xl font-headline-md text-primary mb-6">You May Also Like</h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                            <t t-foreach="similar_books" t-as="sim">
+                                <a t-attf-href="/book/{{sim.id}}" class="group">
+                                    <div class="warm-paper rounded-lg overflow-hidden border border-transparent hover:border-outline-variant/30 hover:shadow-md transition-all">
+                                        <div class="aspect-[2/3] bg-surface-container overflow-hidden">
+                                            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" t-att-src="sim.cover_display_url" t-att-alt="sim.name"/>
+                                        </div>
+                                        <div class="p-3">
+                                            <h4 class="font-headline-md text-primary text-sm line-clamp-1 group-hover:underline"><t t-esc="sim.name"/></h4>
+                                            <p class="text-xs text-on-surface-variant mt-0.5"><t t-esc="sim.author"/></p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </t>
+                        </div>
+                    </section>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         CHECKOUT PAGE
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_checkout" name="Checkout">
+        <t t-call="rumah_buku.frontend_layout">
+            <div class="max-w-5xl mx-auto">
+                <!-- Checkout Header -->
+                <div class="flex items-center gap-3 mb-8">
+                    <a href="/catalog" class="text-on-surface-variant hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-headline-md text-primary">Secure Checkout</h1>
+                        <p class="text-sm text-on-surface-variant">Complete your order to reserve your books.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <!-- Left Column: Forms -->
+                    <div class="lg:col-span-7 flex flex-col gap-6">
+                        <!-- Pickup Details -->
+                        <section class="bg-white rounded-xl shadow-sm p-6 border border-outline-variant/30">
+                            <h2 class="text-lg font-headline-md text-primary mb-5 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">calendar_today</span> Pickup Details
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="text-sm font-semibold text-on-surface-variant">Select Date</label>
+                                    <input type="date" name="pickup_date" id="pickup_date" class="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" required="True"/>
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="text-sm font-semibold text-on-surface-variant">Estimated Time</label>
+                                    <select name="pickup_time" id="pickup_time" class="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                                        <option>09:00 AM - 11:00 AM</option>
+                                        <option>11:00 AM - 01:00 PM</option>
+                                        <option>01:00 PM - 03:00 PM</option>
+                                        <option>03:00 PM - 05:00 PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-start gap-2 bg-primary/5 rounded-lg p-3">
+                                <span class="material-symbols-outlined text-primary text-[18px] mt-0.5">info</span>
+                                <p class="text-xs text-on-surface-variant">Please ensure you arrive within your selected time window. Uncollected orders will be held for 24 hours.</p>
+                            </div>
+                        </section>
+
+                        <!-- Payment Method (Mock) -->
+                        <section class="bg-white rounded-xl shadow-sm p-6 border border-outline-variant/30">
+                            <h2 class="text-lg font-headline-md text-primary mb-5 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">payments</span> Payment Method
+                            </h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="qris" class="peer sr-only" checked="True"/>
+                                    <div class="h-full border border-outline-variant bg-white rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all hover:border-primary peer-checked:border-2 peer-checked:border-primary peer-checked:bg-primary/5">
+                                        <span class="material-symbols-outlined text-primary text-3xl">qr_code_scanner</span>
+                                        <span class="font-semibold text-primary text-sm">QRIS</span>
+                                        <span class="text-[10px] text-on-surface-variant">Scan &amp; Pay</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="bank_transfer" class="peer sr-only"/>
+                                    <div class="h-full border border-outline-variant bg-white rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all hover:border-primary peer-checked:border-2 peer-checked:border-primary peer-checked:bg-primary/5">
+                                        <span class="material-symbols-outlined text-on-surface-variant text-3xl">account_balance</span>
+                                        <span class="font-semibold text-on-surface text-sm">Bank Transfer</span>
+                                        <span class="text-[10px] text-on-surface-variant">Manual Transfer</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="ewallet" class="peer sr-only"/>
+                                    <div class="h-full border border-outline-variant bg-white rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all hover:border-primary peer-checked:border-2 peer-checked:border-primary peer-checked:bg-primary/5">
+                                        <span class="material-symbols-outlined text-on-surface-variant text-3xl">account_balance_wallet</span>
+                                        <span class="font-semibold text-on-surface text-sm">E-Wallet</span>
+                                        <span class="text-[10px] text-on-surface-variant">GoPay, OVO, etc.</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Right Column: Order Summary -->
+                    <div class="lg:col-span-5">
+                        <section class="bg-white rounded-xl shadow-sm p-6 border border-outline-variant/30 sticky top-24">
+                            <h2 class="text-lg font-headline-md text-primary mb-5 pb-4 border-b border-outline-variant/30">Order Summary</h2>
+
+                            <t t-foreach="cart_items" t-as="item">
+                                <div class="flex gap-4 items-start mb-4">
+                                    <div class="w-14 h-20 flex-shrink-0 rounded-lg bg-surface-container overflow-hidden border border-outline-variant/20">
+                                        <img t-att-src="item.book_id.cover_display_url" class="w-full h-full object-cover" t-att-alt="item.book_id.name"/>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-semibold text-on-surface text-sm leading-tight mb-1 line-clamp-2"><t t-esc="item.book_id.name"/></h3>
+                                        <p class="text-xs text-on-surface-variant mb-1.5"><t t-esc="item.book_id.author"/></p>
+                                        <div class="flex justify-between items-center">
+                                            <span class="inline-block px-2 py-0.5 bg-primary/10 text-primary text-[10px] uppercase font-bold rounded-full">
+                                                <t t-if="item.transaction_type == 'borrow'">10 Days Rental</t>
+                                                <t t-else="">Purchase</t>
+                                            </span>
+                                            <span class="text-sm font-bold text-primary">Rp <t t-esc="'{:,.0f}'.format(item.total_amount)"/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <!-- Price Breakdown -->
+                            <div class="space-y-2 text-sm text-on-surface-variant mb-5 border-t border-outline-variant/30 pt-5">
+                                <div class="flex justify-between">
+                                    <span>Subtotal</span>
+                                    <span>Rp <t t-esc="'{:,.0f}'.format(total)"/></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Platform Fee</span>
+                                    <span>Rp <t t-esc="'{:,.0f}'.format(platform_fee)"/></span>
+                                </div>
+                            </div>
+
+                            <!-- Total -->
+                            <div class="flex justify-between items-center text-xl font-headline-md text-primary mb-6 pt-4 border-t border-outline-variant/30">
+                                <span>Total</span>
+                                <span>Rp <t t-esc="'{:,.0f}'.format(grand_total)"/></span>
+                            </div>
+
+                            <form action="/cart/confirm" method="POST">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="pickup_date" id="hidden_pickup_date"/>
+                                <input type="hidden" name="pickup_time" id="hidden_pickup_time"/>
+                                <input type="hidden" name="payment_method" id="hidden_payment_method"/>
+                                <button type="submit" onclick="document.getElementById('hidden_pickup_date').value=document.getElementById('pickup_date').value; document.getElementById('hidden_pickup_time').value=document.getElementById('pickup_time').value; document.getElementById('hidden_payment_method').value=document.querySelector('input[name=payment_method]:checked').value;" class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold hover:bg-primary-container transition-colors shadow-sm flex items-center justify-center gap-2 text-sm">
+                                    <span class="material-symbols-outlined text-[18px]">lock</span> Confirm &amp; Pay
+                                </button>
+                            </form>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Post-Payment Success Modal -->
+                <t t-if="checkout_success">
+                    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" id="success-modal">
+                        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-outline-variant/20 text-center mx-4">
+                            <div class="w-16 h-16 bg-[#dcfce7] text-[#166534] rounded-full flex items-center justify-center mx-auto mb-5">
+                                <span class="material-symbols-outlined text-4xl">check_circle</span>
+                            </div>
+                            <h2 class="text-2xl font-headline-md text-primary mb-2">Payment Successful!</h2>
+                            <p class="text-on-surface-variant text-sm mb-6">Your transaction is confirmed. Show this QR code to the librarian when picking up your books.</p>
+
+                            <!-- QR Code -->
+                            <div class="bg-white border-2 border-dashed border-outline-variant rounded-xl p-5 mb-5 inline-block">
+                                <img t-att-src="'https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;color=012425&amp;data=' + checkout_token" class="w-44 h-44 object-contain mx-auto" alt="QR Code"/>
+                            </div>
+
+                            <div class="bg-primary/5 p-3 rounded-lg mb-6">
+                                <p class="text-xs font-semibold text-primary flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px]">visibility</span> Show this QR to the librarian at pickup.
+                                </p>
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <a href="/my-rentals" class="block w-full bg-primary text-on-primary py-3 rounded-lg font-semibold hover:bg-primary-container transition-colors text-sm">View My Rentals</a>
+                                <a href="/catalog" class="block w-full bg-surface-container text-on-surface py-3 rounded-lg font-semibold hover:bg-surface-variant transition-colors border border-outline-variant/30 text-sm">Continue Browsing</a>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MY RENTALS PAGE
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_my_rentals" name="My Rentals">
+        <t t-call="rumah_buku.frontend_layout">
+            <header class="mb-8 mt-2">
+                <h1 class="text-3xl md:text-4xl font-headline-md text-primary mb-2">My Rentals</h1>
+                <p class="text-base text-on-surface-variant">Track and manage your current reading journey and past adventures.</p>
+            </header>
+
+            <!-- Current Rentals Section -->
+            <section class="mb-12">
+                <div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-3">
+                    <h2 class="text-xl font-headline-md text-on-background">Currently Reading / Active</h2>
+                    <span class="px-3 py-1 bg-primary/10 rounded-full text-xs text-primary font-bold"><t t-esc="len(active_rentals)"/> Items</span>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <t t-foreach="active_rentals" t-as="rental">
+                        <article class="bg-[#FDFBF7] rounded-xl p-5 shadow-sm flex flex-col sm:flex-row gap-5 relative overflow-hidden border border-outline-variant/20 hover:shadow-md transition-shadow">
+                            <!-- Cover -->
+                            <div class="w-28 h-40 shrink-0 relative">
+                                <img t-att-src="rental.book_id.cover_display_url" class="w-full h-full object-cover rounded-lg border border-black/5 shadow-sm" t-att-alt="rental.book_id.name"/>
+                                <div t-attf-class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm flex items-center gap-0.5 {{ 'bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]' if not rental.is_overdue else 'bg-red-100 text-red-700 border border-red-200' }}">
+                                    <span class="material-symbols-outlined text-[12px]">
+                                        <t t-if="rental.is_overdue">warning</t>
+                                        <t t-else="">check_circle</t>
+                                    </span>
+                                    <t t-if="rental.is_overdue">OVERDUE</t>
+                                    <t t-elif="rental.status == 'ready_for_pickup'">PICKUP</t>
+                                    <t t-else="">ACTIVE</t>
+                                </div>
+                            </div>
+                            <!-- Info -->
+                            <div class="flex flex-col flex-grow">
+                                <div>
+                                    <h3 class="text-lg font-headline-md text-primary mb-1 line-clamp-2"><t t-esc="rental.book_id.name"/></h3>
+                                    <p class="text-sm text-on-surface-variant"><t t-esc="rental.book_id.author"/></p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 my-3 bg-white p-3 rounded-lg border border-outline-variant/20">
+                                    <div>
+                                        <span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold mb-0.5">Borrowed</span>
+                                        <span class="block text-xs text-on-background"><t t-esc="rental.start_date and rental.start_date.strftime('%d %b %Y') or 'Pending pickup'"/></span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold mb-0.5">Due Date</span>
+                                        <span t-attf-class="block text-xs font-medium {{ 'text-red-600' if rental.is_overdue else 'text-on-background' }}">
+                                            <t t-esc="rental.due_date and rental.due_date.strftime('%d %b %Y') or '-'"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Actions -->
+                                <div class="flex gap-2 mt-auto">
+                                    <t t-if="rental.status == 'borrowed'">
+                                        <form action="/my-rentals/return" method="POST" class="flex-1">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <input type="hidden" name="transaction_id" t-att-value="rental.id"/>
+                                            <button type="submit" class="w-full bg-primary text-on-primary py-2 px-4 rounded-lg text-xs font-semibold hover:bg-primary-container transition-colors flex items-center justify-center gap-1.5">
+                                                <span class="material-symbols-outlined text-[16px]">keyboard_return</span> Return Book
+                                            </button>
+                                        </form>
+                                    </t>
+                                    <t t-if="rental.status == 'ready_for_pickup'">
+                                        <div class="flex-1 bg-[#D97706]/10 text-[#D97706] py-2 px-4 rounded-lg text-xs font-semibold text-center flex items-center justify-center gap-1.5">
+                                            <span class="material-symbols-outlined text-[16px]">schedule</span> Ready for Pickup
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </article>
+                    </t>
+                    <t t-if="len(active_rentals) == 0">
+                        <div class="col-span-full p-10 text-center text-on-surface-variant bg-white rounded-xl border border-outline-variant/20">
+                            <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-3 block">menu_book</span>
+                            <p class="text-sm">You don't have any active rentals.</p>
+                            <a href="/catalog" class="text-primary font-semibold hover:underline text-sm mt-2 inline-block">Browse Catalog</a>
+                        </div>
+                    </t>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section>
+                <div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-3">
+                    <h2 class="text-xl font-headline-md text-on-background">Reading History</h2>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <t t-foreach="history_rentals" t-as="history">
+                        <div class="bg-[#FDFBF7] rounded-xl p-3.5 shadow-sm flex flex-col h-full hover:-translate-y-1 transition-all duration-200 border border-outline-variant/20 hover:shadow-md">
+                            <div class="aspect-[2/3] bg-surface-container rounded-lg overflow-hidden mb-3 border border-black/5">
+                                <img t-att-src="history.book_id.cover_display_url" class="w-full h-full object-cover" t-att-alt="history.book_id.name"/>
+                            </div>
+                            <div class="flex flex-col flex-grow">
+                                <h4 class="font-headline-md text-primary text-sm line-clamp-1 mb-0.5"><t t-esc="history.book_id.name"/></h4>
+                                <p class="text-[11px] text-on-surface-variant mb-2"><t t-esc="history.book_id.author"/></p>
+                                <div class="mt-auto flex items-center justify-between">
+                                    <span t-attf-class="px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-bold {{ 'bg-[#dcfce7] text-[#166534]' if history.status == 'completed' else 'bg-red-100 text-red-700' }}">
+                                        <t t-if="history.status == 'completed'">Returned</t>
+                                        <t t-else=""><t t-esc="history.status"/></t>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+
+                    <!-- CTA Card -->
+                    <a href="/catalog" class="border border-dashed border-outline-variant rounded-xl p-4 flex flex-col items-center justify-center text-center h-full min-h-[250px] bg-white/50 hover:bg-surface-container transition-colors group">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined">library_add</span>
+                        </div>
+                        <h4 class="font-headline-md text-primary text-sm mb-1">Find Your Next Read</h4>
+                        <p class="text-[11px] text-on-surface-variant mb-3 px-2">Browse the catalog for your next adventure.</p>
+                        <span class="text-primary text-xs font-semibold">Explore Catalog →</span>
+                    </a>
+                </div>
+            </section>
+        </t>
+    </template>
+</odoo>

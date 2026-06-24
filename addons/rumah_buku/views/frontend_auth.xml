@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══════════════════════════════════════════════════════════
+         LOGIN PAGE — Standalone (no header/footer)
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_login" name="Login Page">
+        &lt;!DOCTYPE html&gt;
+        <html class="light" lang="id">
+        <head>
+            <meta charset="utf-8"/>
+            <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+            <title>Sign In — BukuRumah</title>
+            <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+            <script>
+                tailwind.config = {
+                    darkMode: "class",
+                    theme: {
+                        extend: {
+                            colors: {
+                                primary: "#012425",
+                                "on-primary": "#ffffff",
+                                "primary-container": "#1a3a3a",
+                                "on-surface": "#191c1d",
+                                "on-surface-variant": "#414848",
+                                background: "#f8f9fa",
+                                "surface-container-lowest": "#ffffff",
+                                "surface-container": "#edeeef",
+                                "outline-variant": "#c1c8c7",
+                                outline: "#717878",
+                                accent: "#D97706",
+                            },
+                            fontFamily: {
+                                "label-md": ["Inter"],
+                                "headline-md": ["Playfair Display"],
+                                "body-md": ["Inter"],
+                                "body-sm": ["Inter"],
+                                "label-sm": ["Inter"],
+                            }
+                        }
+                    }
+                }
+            </script>
+            <style>
+                .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+                ::-webkit-scrollbar { width: 6px; }
+                ::-webkit-scrollbar-track { background: transparent; }
+                ::-webkit-scrollbar-thumb { background: #c1c8c7; border-radius: 3px; }
+            </style>
+        </head>
+        <body class="bg-background text-on-surface antialiased selection:bg-primary selection:text-on-primary">
+            <div class="min-h-screen flex flex-col md:flex-row w-full">
+                <!-- Left Side: Image Canvas -->
+                <div class="hidden md:flex md:w-1/2 relative bg-surface-container overflow-hidden">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105" style="background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200&amp;q=80')"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent to-background/90 md:to-background mix-blend-normal"></div>
+                    <div class="absolute bottom-10 left-10 right-10 z-10 max-w-md hidden lg:block">
+                        <blockquote class="font-headline-md text-2xl text-on-surface mb-2">
+                            "A room without books is like a body without a soul."
+                        </blockquote>
+                        <p class="font-body-sm text-on-surface-variant">— Marcus Tullius Cicero</p>
+                    </div>
+                </div>
+                <!-- Right Side: Form Canvas -->
+                <div class="w-full md:w-1/2 flex flex-col justify-center items-center px-6 py-16 md:px-auto bg-background relative z-10">
+                    <div class="w-full max-w-sm flex flex-col gap-8">
+                        <div class="text-center md:text-left space-y-3">
+                            <h1 class="font-headline-md text-2xl text-primary flex items-center justify-center md:justify-start gap-2 mb-4">
+                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+                                BukuRumah
+                            </h1>
+                            <h2 class="font-headline-md text-3xl text-on-surface">Welcome back</h2>
+                            <p class="font-body-md text-on-surface-variant">Please enter your details to access your library.</p>
+                        </div>
+
+                        <!-- Error Messages -->
+                        <t t-if="error">
+                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg relative flex items-center gap-2" role="alert">
+                                <span class="material-symbols-outlined text-[18px]">error</span>
+                                <span class="text-sm"><t t-esc="error"/></span>
+                            </div>
+                        </t>
+
+                        <!-- Form -->
+                        <form action="/web/login" method="POST" class="flex flex-col gap-5">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="flex flex-col gap-1.5">
+                                <label class="font-label-md text-on-surface text-sm font-medium" for="login">Email Address / Login</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">mail</span>
+                                    <input type="text" id="login" name="login" placeholder="Enter your email" class="w-full pl-10 pr-3 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface placeholder-outline focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" required="True"/>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <label class="font-label-md text-on-surface text-sm font-medium" for="password">Password</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">lock</span>
+                                    <input type="password" id="password" name="password" placeholder="Enter your password" class="w-full pl-10 pr-3 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface placeholder-outline focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" required="True"/>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary"/>
+                                    <span class="text-sm text-on-surface-variant">Remember 30 days</span>
+                                </label>
+                                <a href="/web/reset_password" class="font-label-sm text-primary hover:underline transition-all text-sm">Forgot password?</a>
+                            </div>
+                            <button type="submit" class="w-full bg-primary text-on-primary font-label-md py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-primary-container transition-colors mt-1 shadow-md text-sm font-semibold">
+                                <span class="material-symbols-outlined text-[18px]">login</span> Sign In
+                            </button>
+                        </form>
+                        <p class="text-center font-body-sm text-on-surface-variant text-sm">
+                            Don't have an account? <a href="/web/signup" class="text-primary font-semibold hover:underline">Sign up</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         REGISTER PAGE — Standalone (no header/footer)
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_register" name="Register Page">
+        &lt;!DOCTYPE html&gt;
+        <html class="light" lang="id">
+        <head>
+            <meta charset="utf-8"/>
+            <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+            <title>Register — BukuRumah</title>
+            <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+            <script>
+                tailwind.config = {
+                    darkMode: "class",
+                    theme: {
+                        extend: {
+                            colors: {
+                                primary: "#012425",
+                                "on-primary": "#ffffff",
+                                "primary-container": "#1a3a3a",
+                                "on-surface": "#191c1d",
+                                "on-surface-variant": "#414848",
+                                background: "#f8f9fa",
+                                "surface-container-lowest": "#ffffff",
+                                "surface-container": "#edeeef",
+                                "surface-variant": "#e1e3e4",
+                                "outline-variant": "#c1c8c7",
+                                outline: "#717878",
+                            },
+                            fontFamily: {
+                                "label-md": ["Inter"],
+                                "headline-md": ["Playfair Display"],
+                                "body-md": ["Inter"],
+                                "body-sm": ["Inter"],
+                                "label-sm": ["Inter"],
+                                "display": ["Playfair Display"],
+                                "body-lg": ["Inter"],
+                            }
+                        }
+                    }
+                }
+            </script>
+            <style>
+                .glass-panel {
+                    background: rgba(253, 251, 247, 0.92);
+                    backdrop-filter: blur(16px);
+                    box-shadow: 0px 10px 40px rgba(26, 58, 58, 0.1);
+                }
+            </style>
+        </head>
+        <body class="bg-background text-on-background min-h-screen flex items-center justify-center font-body-md antialiased overflow-x-hidden">
+            <div class="w-full min-h-screen flex">
+                <!-- Left: Hero Image -->
+                <div class="hidden lg:flex w-1/2 relative bg-surface-container overflow-hidden items-center justify-center">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&amp;q=80')"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-primary/30 mix-blend-multiply"></div>
+                    <div class="relative z-10 p-16 text-center max-w-lg mx-auto">
+                        <span class="material-symbols-outlined text-6xl text-on-primary mb-6 block" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+                        <h1 class="font-display text-4xl text-on-primary mb-4">Begin Your Journey</h1>
+                        <p class="font-body-lg text-lg text-on-primary/90">Join BukuRumah to curate your personal library, discover rare editions, and connect with fellow enthusiasts.</p>
+                    </div>
+                </div>
+
+                <!-- Right: Form -->
+                <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
+                    <div class="w-full max-w-md glass-panel rounded-xl p-10">
+                        <div class="mb-8 text-center lg:text-left">
+                            <h2 class="font-headline-md text-3xl text-primary mb-2">Create an Account</h2>
+                            <p class="font-body-md text-on-surface-variant">Welcome to the sanctuary for book lovers.</p>
+                        </div>
+
+                        <t t-if="error">
+                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg relative mb-6 flex items-center gap-2" role="alert">
+                                <span class="material-symbols-outlined text-[18px]">error</span>
+                                <span class="text-sm"><t t-esc="error"/></span>
+                            </div>
+                        </t>
+
+                        <form action="/web/signup" method="POST" class="space-y-5">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div>
+                                <label class="block font-label-md text-on-surface mb-1.5 text-sm font-medium" for="name">Full Name</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">person</span>
+                                    <input type="text" id="name" name="name" placeholder="Enter your full name" class="w-full pl-10 pr-3 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-body-md text-sm" required="True"/>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-on-surface mb-1.5 text-sm font-medium" for="login">Email Address</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">mail</span>
+                                    <input type="email" id="login" name="login" placeholder="Enter your email" class="w-full pl-10 pr-3 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-body-md text-sm" required="True"/>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-on-surface mb-1.5 text-sm font-medium" for="phone">Phone Number <span class="text-outline">(Optional)</span></label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">phone</span>
+                                    <input type="tel" id="phone" name="phone_number" placeholder="+62 xxx xxxx xxxx" class="w-full pl-10 pr-3 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-body-md text-sm"/>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-on-surface mb-1.5 text-sm font-medium" for="password">Password</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">lock</span>
+                                    <input type="password" id="password" name="password" placeholder="Create a password" class="w-full pl-10 pr-3 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-body-md text-sm" required="True"/>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-on-surface mb-1.5 text-sm font-medium" for="confirm_password">Confirm Password</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">lock_clock</span>
+                                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" class="w-full pl-10 pr-3 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-body-md text-sm" required="True"/>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <input type="checkbox" id="terms" class="w-4 h-4 mt-0.5 rounded border-outline-variant text-primary focus:ring-primary" required="True"/>
+                                <label for="terms" class="text-sm text-on-surface-variant">I agree to the <a href="#" class="text-primary hover:underline">Terms of Service</a> and <a href="#" class="text-primary hover:underline">Privacy Policy</a></label>
+                            </div>
+                            <button type="submit" class="w-full bg-primary text-on-primary font-label-md py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-container transition-all duration-200 shadow-md text-sm font-semibold">
+                                <span>Register Account</span>
+                                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                            </button>
+                        </form>
+                        <div class="mt-8 text-center border-t border-surface-variant pt-6">
+                            <p class="font-body-sm text-on-surface-variant text-sm">
+                                Already have an account? <a href="/web/login" class="text-primary font-semibold hover:underline ml-1">Sign In</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    </template>
+</odoo>

@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══════════════════════════════════════════════════════════
+         HEADER TEMPLATE — Reusable navigation bar
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_header" name="Frontend Header">
+        <header class="bg-surface shadow-[0px_4px_20px_rgba(26,58,58,0.05)] sticky top-0 z-50">
+            <div class="flex justify-between items-center w-full px-margin-mobile md:px-8 max-w-max-width mx-auto h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+                    <a class="text-xl font-headline-md font-bold text-primary" href="/catalog">BukuRumah</a>
+                </div>
+
+                <!-- Nav Links (center) -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a t-attf-class="text-sm font-medium transition-colors {{ 'text-primary border-b-2 border-primary pb-1 font-bold' if request.httprequest.path in ['/', '/catalog'] else 'text-on-surface-variant hover:text-primary' }}" href="/catalog">Catalog</a>
+                    <a t-attf-class="text-sm font-medium transition-colors {{ 'text-primary border-b-2 border-primary pb-1 font-bold' if request.httprequest.path == '/my-rentals' else 'text-on-surface-variant hover:text-primary' }}" href="/my-rentals">My Rentals</a>
+                </nav>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-3">
+                    <t t-if="request.env.user.id != request.env.ref('base.public_user').id">
+                        <!-- Notifications -->
+                        <t t-set="unread_notifs" t-value="request.env['rumah_buku.notification'].sudo().search_count([('user_id', '=', request.env.user.id), ('is_read', '=', False)])"/>
+                        <button class="relative text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-variant">
+                            <span class="material-symbols-outlined text-[22px]">notifications</span>
+                            <t t-if="unread_notifs > 0">
+                                <span class="absolute top-1 right-1 w-4 h-4 bg-[#D97706] text-white text-[9px] flex items-center justify-center rounded-full font-bold"><t t-esc="unread_notifs"/></span>
+                            </t>
+                        </button>
+
+                        <!-- Cart -->
+                        <t t-set="cart_items" t-value="request.env['rumah_buku.transaction'].sudo().search([('user_id', '=', request.env.user.id), ('status', '=', 'pending')])"/>
+                        <button onclick="toggleCart()" class="relative text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-variant">
+                            <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
+                            <t t-if="len(cart_items) > 0">
+                                <span class="absolute top-1 right-1 w-4 h-4 bg-primary text-on-primary text-[9px] flex items-center justify-center rounded-full font-bold"><t t-esc="len(cart_items)"/></span>
+                            </t>
+                        </button>
+
+                        <!-- Profile Popover -->
+                        <div class="relative" id="profilePopover">
+                            <button onclick="toggleProfile()" class="flex items-center gap-2 p-1 rounded-full hover:bg-surface-variant transition-colors">
+                                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-outline-variant bg-primary flex items-center justify-center">
+                                    <span class="text-on-primary text-xs font-bold"><t t-esc="request.env.user.name[:2].upper()"/></span>
+                                </div>
+                            </button>
+                            <!-- Dropdown -->
+                            <div id="profileDropdown" class="hidden absolute right-0 top-12 w-72 bg-white rounded-xl shadow-lg border border-outline-variant/30 z-50 overflow-hidden animate-fade-in">
+                                <div class="p-4 bg-gradient-to-br from-primary/5 to-transparent border-b border-outline-variant/20">
+                                    <p class="font-semibold text-on-surface"><t t-esc="request.env.user.name"/></p>
+                                    <p class="text-sm text-on-surface-variant"><t t-esc="request.env.user.login"/></p>
+                                </div>
+                                <div class="p-2">
+                                    <a href="/my-rentals" class="flex items-center gap-3 px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors">
+                                        <span class="material-symbols-outlined text-[18px]">history</span> Reading History
+                                    </a>
+                                </div>
+                                <div class="p-2 border-t border-outline-variant/20">
+                                    <a href="/web/session/logout" class="flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        <span class="material-symbols-outlined text-[18px]">logout</span> Sign Out
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <a href="/web/login" class="bg-primary text-on-primary px-5 py-2 rounded text-sm font-semibold hover:bg-primary-container transition-colors shadow-sm">Sign In</a>
+                    </t>
+                </div>
+            </div>
+        </header>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         FOOTER TEMPLATE
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_footer" name="Frontend Footer">
+        <footer class="bg-[#f3f4f5] w-full mt-16 border-t border-outline-variant/30">
+            <div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-8 max-w-max-width mx-auto py-8 gap-6 md:gap-0">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+                    <span class="text-sm font-headline-md font-bold text-primary">BukuRumah</span>
+                </div>
+                <div class="flex flex-wrap gap-6 text-xs text-on-surface-variant">
+                    <a href="#" class="hover:text-primary transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-primary transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-primary transition-colors">Cookie Settings</a>
+                    <a href="#" class="hover:text-primary transition-colors">Contact Us</a>
+                </div>
+                <div class="text-on-surface-variant text-xs">
+                    © 2024 BukuRumah Modern Library. All rights reserved.
+                </div>
+            </div>
+        </footer>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MAIN LAYOUT — Header + Content + Footer + Cart Drawer
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_layout" name="Rumah Buku Frontend Layout">
+        &lt;!DOCTYPE html&gt;
+        <html class="light" lang="id">
+            <head>
+                <meta charset="utf-8"/>
+                <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+                <title>BukuRumah — Modern Library</title>
+                <meta name="description" content="BukuRumah: Toko buku dan perpustakaan modern. Sewa atau beli buku fisik favorit Anda."/>
+                <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+                <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+                <link href="https://fonts.googleapis.com" rel="preconnect"/>
+                <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+                <script>
+                    tailwind.config = {
+                        darkMode: "class",
+                        theme: {
+                            extend: {
+                                colors: {
+                                    "primary": "#012425",
+                                    "on-primary": "#ffffff",
+                                    "primary-container": "#1a3a3a",
+                                    "on-primary-container": "#83a4a3",
+                                    "surface": "#f8f9fa",
+                                    "on-surface": "#191c1d",
+                                    "surface-variant": "#e1e3e4",
+                                    "on-surface-variant": "#414848",
+                                    "outline": "#717878",
+                                    "outline-variant": "#c1c8c7",
+                                    "background": "#f8f9fa",
+                                    "on-background": "#191c1d",
+                                    "surface-container": "#edeeef",
+                                    "surface-container-lowest": "#ffffff",
+                                    "surface-container-highest": "#e1e3e4",
+                                    "accent": "#D97706",
+                                    "accent-hover": "#B45309",
+                                },
+                                spacing: {
+                                    "margin-mobile": "16px",
+                                    "max-width": "1280px",
+                                    "margin-desktop": "auto",
+                                    "xl": "64px",
+                                    "lg": "40px",
+                                    "md": "24px",
+                                    "gutter": "24px",
+                                },
+                                fontFamily: {
+                                    "headline-md": ["Playfair Display", "serif"],
+                                    "headline-lg": ["Playfair Display", "serif"],
+                                    "display": ["Playfair Display", "serif"],
+                                    "label-sm": ["Inter", "sans-serif"],
+                                    "body-md": ["Inter", "sans-serif"],
+                                    "label-md": ["Inter", "sans-serif"],
+                                    "body-sm": ["Inter", "sans-serif"],
+                                    "body-lg": ["Inter", "sans-serif"],
+                                },
+                                animation: {
+                                    "fade-in": "fadeIn 0.2s ease-out",
+                                    "slide-up": "slideUp 0.3s ease-out",
+                                },
+                                keyframes: {
+                                    fadeIn: { "0%": { opacity: "0" }, "100%": { opacity: "1" } },
+                                    slideUp: { "0%": { opacity: "0", transform: "translateY(10px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
+                                },
+                            }
+                        }
+                    }
+                </script>
+                <style>
+                    .warm-paper { background-color: #FDFBF7; }
+                    .soft-shadow { box-shadow: 0px 4px 20px rgba(26, 58, 58, 0.05); }
+                    ::-webkit-scrollbar { width: 6px; }
+                    ::-webkit-scrollbar-track { background: transparent; }
+                    ::-webkit-scrollbar-thumb { background: #c1c8c7; border-radius: 3px; }
+                    ::-webkit-scrollbar-thumb:hover { background: #717878; }
+                </style>
+            </head>
+            <body class="bg-background text-on-background font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+                <!-- TopNavBar -->
+                <t t-call="rumah_buku.frontend_header"/>
+
+                <!-- Main Content -->
+                <main class="w-full max-w-max-width mx-auto px-margin-mobile md:px-8 py-8 min-h-[70vh]">
+                    <t t-out="0"/>
+                </main>
+
+                <!-- Footer -->
+                <t t-call="rumah_buku.frontend_footer"/>
+
+                <!-- Cart Drawer Overlay -->
+                <div id="cartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+                <!-- Cart Drawer -->
+                <div id="cartDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white shadow-xl z-50 flex flex-col transform translate-x-full transition-transform duration-300">
+                    <div class="flex items-center justify-between p-6 border-b border-surface-container-highest">
+                        <h2 class="text-xl font-headline-md text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined">local_mall</span> Your Cart
+                        </h2>
+                        <button onclick="toggleCart()" class="text-on-surface-variant hover:bg-surface-variant p-2 rounded-full transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <t t-if="request.env.user.id != request.env.ref('base.public_user').id">
+                        <t t-set="cart_items_drawer" t-value="request.env['rumah_buku.transaction'].sudo().search([('user_id', '=', request.env.user.id), ('status', '=', 'pending')])"/>
+                        <div class="flex-grow p-6 overflow-y-auto flex flex-col gap-4 bg-background">
+                            <t t-foreach="cart_items_drawer" t-as="item">
+                                <div class="flex gap-4 p-4 bg-white rounded-lg border border-surface-container shadow-sm hover:shadow-md transition-shadow">
+                                    <div class="w-14 h-20 flex-shrink-0 rounded border border-black/5 overflow-hidden bg-surface-variant">
+                                        <img t-att-src="item.book_id.cover_display_url" class="w-full h-full object-cover" alt="Book cover"/>
+                                    </div>
+                                    <div class="flex flex-col justify-between flex-grow min-w-0">
+                                        <div>
+                                            <div class="flex justify-between items-start gap-2">
+                                                <h3 class="font-semibold text-primary text-sm line-clamp-2"><t t-esc="item.book_id.name"/></h3>
+                                                <form action="/cart/remove" method="POST" class="shrink-0">
+                                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                    <input type="hidden" name="transaction_id" t-att-value="item.id"/>
+                                                    <button type="submit" class="text-on-surface-variant hover:text-red-500 transition-colors p-1"><span class="material-symbols-outlined text-[16px]">close</span></button>
+                                                </form>
+                                            </div>
+                                            <p class="text-xs text-on-surface-variant mt-0.5"><t t-esc="item.book_id.author"/></p>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-2">
+                                            <span class="text-[10px] uppercase tracking-widest text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-medium"><t t-esc="item.transaction_type"/></span>
+                                            <span class="font-bold text-sm text-primary">Rp <t t-esc="'{:,.0f}'.format(item.total_amount)"/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-if="len(cart_items_drawer) == 0">
+                                <div class="flex flex-col items-center justify-center h-full text-on-surface-variant opacity-40 py-16">
+                                    <span class="material-symbols-outlined text-6xl mb-3">shopping_basket</span>
+                                    <p class="text-sm">Your cart is empty</p>
+                                </div>
+                            </t>
+                        </div>
+
+                        <t t-if="len(cart_items_drawer) > 0">
+                            <div class="p-6 border-t border-surface-container-highest bg-white">
+                                <div class="flex justify-between text-sm text-on-surface-variant mb-3">
+                                    <span>Subtotal (<t t-esc="len(cart_items_drawer)"/> items)</span>
+                                    <span class="font-semibold text-on-surface">Rp <t t-esc="'{:,.0f}'.format(sum(cart_items_drawer.mapped('total_amount')))"/></span>
+                                </div>
+                                <a href="/cart/checkout" class="block w-full bg-accent text-white py-3 rounded font-bold hover:bg-accent-hover transition-colors shadow-sm text-center text-sm">
+                                    Proceed to Checkout
+                                    <span class="material-symbols-outlined text-[16px] align-middle ml-1">arrow_forward</span>
+                                </a>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+
+                <!-- JavaScript -->
+                <script>
+                    function toggleCart() {
+                        const overlay = document.getElementById('cartOverlay');
+                        const drawer = document.getElementById('cartDrawer');
+                        if (drawer.classList.contains('translate-x-0')) {
+                            drawer.classList.remove('translate-x-0');
+                            drawer.classList.add('translate-x-full');
+                            overlay.classList.add('opacity-0', 'pointer-events-none');
+                            overlay.classList.remove('opacity-100');
+                        } else {
+                            drawer.classList.remove('translate-x-full');
+                            drawer.classList.add('translate-x-0');
+                            overlay.classList.remove('opacity-0', 'pointer-events-none');
+                            overlay.classList.add('opacity-100');
+                        }
+                    }
+
+                    function toggleProfile() {
+                        const dd = document.getElementById('profileDropdown');
+                        dd.classList.toggle('hidden');
+                    }
+
+                    // Close profile dropdown on outside click
+                    document.addEventListener('click', function(e) {
+                        const popover = document.getElementById('profilePopover');
+                        const dd = document.getElementById('profileDropdown');
+                        if (popover &amp;&amp; dd &amp;&amp; !popover.contains(e.target)) {
+                            dd.classList.add('hidden');
+                        }
+                    });
+
+                    // Format Rupiah helper
+                    function formatRp(num) {
+                        return 'Rp ' + new Intl.NumberFormat('id-ID').format(num);
+                    }
+                </script>
+            </body>
+        </html>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         CATALOG PAGE
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="frontend_catalog_page" name="Catalog Page">
+        <t t-call="rumah_buku.frontend_layout">
+            <!-- Hero Section -->
+            <section class="mb-10 text-center md:text-left flex flex-col md:flex-row items-center gap-8 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl p-8 md:p-12">
+                <div class="flex-1 space-y-4">
+                    <h1 class="text-4xl md:text-5xl font-display text-primary leading-tight">Discover Your Next<br/>Great Read</h1>
+                    <p class="text-body-lg text-on-surface-variant max-w-xl">
+                        Explore a curated collection of physical literature. Rent a classic, buy a new release — all at BukuRumah.
+                    </p>
+                </div>
+                <div class="hidden md:block w-64 h-48 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden">
+                    <span class="material-symbols-outlined text-8xl text-primary/30" style="font-variation-settings: 'FILL' 1;">local_library</span>
+                </div>
+            </section>
+
+            <!-- Search & Filter Bar -->
+            <div class="flex flex-col md:flex-row gap-4 mb-8 items-stretch md:items-center">
+                <form action="/catalog" method="GET" class="flex-1 flex gap-3 items-center">
+                    <div class="relative flex-1">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+                        <input type="text" name="search" t-att-value="search" placeholder="Search by title, author, or ISBN..." class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-outline-variant bg-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"/>
+                    </div>
+                    <input type="hidden" name="category" t-att-value="category"/>
+                    <input type="hidden" name="sort" t-att-value="sort"/>
+                    <button type="submit" class="bg-primary text-on-primary px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors">Search</button>
+                </form>
+                <div class="flex gap-3">
+                    <select onchange="window.location.href='/catalog?search='+encodeURIComponent(document.querySelector('input[name=search]').value)+'&amp;category='+this.value+'&amp;sort='+document.querySelector('select[data-sort]').value" class="bg-white border border-outline-variant rounded-lg px-3 py-2.5 text-sm text-on-surface focus:border-primary outline-none cursor-pointer">
+                        <t t-foreach="categories" t-as="cat">
+                            <option t-att-value="cat[0]" t-att-selected="cat[0] == category"><t t-esc="cat[1]"/></option>
+                        </t>
+                    </select>
+                    <select data-sort="" onchange="window.location.href='/catalog?search='+encodeURIComponent(document.querySelector('input[name=search]').value)+'&amp;category='+encodeURIComponent(document.querySelector('select:first-of-type').value)+'&amp;sort='+this.value" class="bg-white border border-outline-variant rounded-lg px-3 py-2.5 text-sm text-on-surface focus:border-primary outline-none cursor-pointer">
+                        <option value="newest" t-att-selected="sort == 'newest'">Newly Added</option>
+                        <option value="title" t-att-selected="sort == 'title'">Title A-Z</option>
+                        <option value="price_low" t-att-selected="sort == 'price_low'">Price: Low to High</option>
+                        <option value="price_high" t-att-selected="sort == 'price_high'">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Book Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
+                <t t-foreach="books" t-as="book">
+                    <a t-attf-href="/book/{{book.id}}" class="group">
+                        <article class="warm-paper rounded-xl soft-shadow overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-outline-variant/30 h-full">
+                            <div class="relative aspect-[3/4] bg-surface-container flex items-center justify-center overflow-hidden">
+                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" t-att-src="book.cover_display_url" t-att-alt="book.name"/>
+                                <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"
+                                     t-attf-class="{{ 'bg-[#dcfce7] text-[#166534]' if book.status == 'available' else 'bg-red-100 text-red-700' }}">
+                                    <t t-esc="book.status"/>
+                                </div>
+                            </div>
+                            <div class="p-4 flex flex-col flex-1">
+                                <h3 class="font-headline-md text-primary text-base leading-snug mb-1 line-clamp-2 group-hover:underline"><t t-esc="book.name"/></h3>
+                                <p class="text-xs text-on-surface-variant mb-3"><t t-esc="book.author"/></p>
+                                <div class="mt-auto flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        <span t-if="book.is_rentable" class="px-1.5 py-0.5 bg-primary/10 text-primary rounded text-[10px] font-bold uppercase">Rent</span>
+                                        <span t-if="book.sell_price > 0" class="px-1.5 py-0.5 bg-accent/10 text-accent rounded text-[10px] font-bold uppercase">Buy</span>
+                                    </div>
+                                    <span class="text-sm font-bold text-primary">Rp <t t-esc="'{:,.0f}'.format(book.sell_price or book.rent_price_per_day * 10)"/></span>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+                </t>
+            </div>
+
+            <t t-if="len(books) == 0">
+                <div class="text-center py-16">
+                    <span class="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4 block">search_off</span>
+                    <p class="text-lg text-on-surface-variant">No books found matching your criteria.</p>
+                    <a href="/catalog" class="text-primary font-semibold hover:underline mt-2 inline-block">Clear filters</a>
+                </div>
+            </t>
+
+            <!-- Pagination -->
+            <t t-if="total_pages > 1">
+                <div class="flex items-center justify-between mt-8 text-sm">
+                    <p class="text-on-surface-variant">
+                        Showing <t t-esc="(page - 1) * per_page + 1"/>–<t t-esc="min(page * per_page, total_books)"/> of <t t-esc="total_books"/> books
+                    </p>
+                    <div class="flex gap-1">
+                        <t t-if="page > 1">
+                            <a t-attf-href="/catalog?search={{search}}&amp;category={{category}}&amp;sort={{sort}}&amp;page={{page - 1}}" class="px-3 py-1.5 rounded border border-outline-variant hover:bg-surface-variant transition-colors text-on-surface-variant">Prev</a>
+                        </t>
+                        <t t-foreach="range(1, total_pages + 1)" t-as="p">
+                            <a t-attf-href="/catalog?search={{search}}&amp;category={{category}}&amp;sort={{sort}}&amp;page={{p}}"
+                               t-attf-class="px-3 py-1.5 rounded transition-colors {{ 'bg-primary text-on-primary font-bold' if p == page else 'border border-outline-variant hover:bg-surface-variant text-on-surface-variant' }}">
+                                <t t-esc="p"/>
+                            </a>
+                        </t>
+                        <t t-if="page &lt; total_pages">
+                            <a t-attf-href="/catalog?search={{search}}&amp;category={{category}}&amp;sort={{sort}}&amp;page={{page + 1}}" class="px-3 py-1.5 rounded border border-outline-variant hover:bg-surface-variant transition-colors text-on-surface-variant">Next</a>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- ═══════════════════════════════════════════════════════
+             SEED DATA — Sample Books (15 books)
+             ═══════════════════════════════════════════════════════ -->
+        <record id="book_01" model="rumah_buku.book">
+            <field name="name">Laskar Pelangi</field>
+            <field name="isbn">978-979-1227-01-2</field>
+            <field name="author">Andrea Hirata</field>
+            <field name="publisher">Bentang Pustaka</field>
+            <field name="synopsis">Kisah inspiratif tentang perjuangan anak-anak Belitung yang penuh semangat belajar di sekolah Muhammadiyah.</field>
+            <field name="category">fiction</field>
+            <field name="status">available</field>
+            <field name="stock">5</field>
+            <field name="location_rack">A-01</field>
+            <field name="sell_price">75000</field>
+            <field name="rent_price_per_day">5000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2005</field>
+            <field name="pages">529</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1568077757i/1362193.jpg</field>
+        </record>
+
+        <record id="book_02" model="rumah_buku.book">
+            <field name="name">Bumi Manusia</field>
+            <field name="isbn">978-979-3062-00-1</field>
+            <field name="author">Pramoedya Ananta Toer</field>
+            <field name="publisher">Hasta Mitra</field>
+            <field name="synopsis">Novel sejarah yang mengisahkan perjuangan Minke melawan kolonialisme Belanda di era pergerakan nasional.</field>
+            <field name="category">fiction</field>
+            <field name="status">available</field>
+            <field name="stock">3</field>
+            <field name="location_rack">A-02</field>
+            <field name="sell_price">95000</field>
+            <field name="rent_price_per_day">7000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">1980</field>
+            <field name="pages">535</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1565392573i/1398034.jpg</field>
+        </record>
+
+        <record id="book_03" model="rumah_buku.book">
+            <field name="name">Atomic Habits</field>
+            <field name="isbn">978-0-7352-1129-2</field>
+            <field name="author">James Clear</field>
+            <field name="publisher">Penguin Random House</field>
+            <field name="synopsis">Panduan praktis untuk membangun kebiasaan baik dan menghancurkan kebiasaan buruk secara bertahap.</field>
+            <field name="category">self_help</field>
+            <field name="status">available</field>
+            <field name="stock">8</field>
+            <field name="location_rack">B-01</field>
+            <field name="sell_price">120000</field>
+            <field name="rent_price_per_day">8000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2018</field>
+            <field name="pages">320</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1655988385i/40121378.jpg</field>
+        </record>
+
+        <record id="book_04" model="rumah_buku.book">
+            <field name="name">Clean Code</field>
+            <field name="isbn">978-0-13-235088-4</field>
+            <field name="author">Robert C. Martin</field>
+            <field name="publisher">Prentice Hall</field>
+            <field name="synopsis">Panduan menulis kode yang bersih, mudah dibaca, dan mudah dipelihara untuk developer profesional.</field>
+            <field name="category">tech_business</field>
+            <field name="status">available</field>
+            <field name="stock">4</field>
+            <field name="location_rack">C-01</field>
+            <field name="sell_price">180000</field>
+            <field name="rent_price_per_day">10000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2008</field>
+            <field name="pages">464</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1436202607i/3735293.jpg</field>
+        </record>
+
+        <record id="book_05" model="rumah_buku.book">
+            <field name="name">Sapiens: A Brief History of Humankind</field>
+            <field name="isbn">978-0-06-231609-7</field>
+            <field name="author">Yuval Noah Harari</field>
+            <field name="publisher">Harper</field>
+            <field name="synopsis">Eksplorasi mendalam tentang sejarah umat manusia dari zaman batu hingga era modern.</field>
+            <field name="category">history</field>
+            <field name="status">available</field>
+            <field name="stock">6</field>
+            <field name="location_rack">D-01</field>
+            <field name="sell_price">150000</field>
+            <field name="rent_price_per_day">9000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2014</field>
+            <field name="pages">443</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1595674533i/23692271.jpg</field>
+        </record>
+
+        <record id="book_06" model="rumah_buku.book">
+            <field name="name">The Design of Everyday Things</field>
+            <field name="isbn">978-0-465-05065-9</field>
+            <field name="author">Don Norman</field>
+            <field name="publisher">Basic Books</field>
+            <field name="synopsis">Buku klasik tentang prinsip desain yang baik dan psikologi interaksi manusia-objek.</field>
+            <field name="category">art_design</field>
+            <field name="status">available</field>
+            <field name="stock">3</field>
+            <field name="location_rack">E-01</field>
+            <field name="sell_price">135000</field>
+            <field name="rent_price_per_day">8000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2013</field>
+            <field name="pages">368</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1442460745i/840.jpg</field>
+        </record>
+
+        <record id="book_07" model="rumah_buku.book">
+            <field name="name">Filosofi Teras</field>
+            <field name="isbn">978-602-291-607-0</field>
+            <field name="author">Henry Manampiring</field>
+            <field name="publisher">Penerbit Buku Kompas</field>
+            <field name="synopsis">Pengantar filsafat Stoisisme yang dikemas ringan dan relevan untuk kehidupan modern.</field>
+            <field name="category">self_help</field>
+            <field name="status">available</field>
+            <field name="stock">7</field>
+            <field name="location_rack">B-02</field>
+            <field name="sell_price">85000</field>
+            <field name="rent_price_per_day">6000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2018</field>
+            <field name="pages">346</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1546854erta/43982453.jpg</field>
+        </record>
+
+        <record id="book_08" model="rumah_buku.book">
+            <field name="name">A Brief History of Time</field>
+            <field name="isbn">978-0-553-38016-3</field>
+            <field name="author">Stephen Hawking</field>
+            <field name="publisher">Bantam Books</field>
+            <field name="synopsis">Penjelasan kosmologi dan fisika yang mudah dipahami oleh publik umum dari salah satu fisikawan terbesar.</field>
+            <field name="category">science</field>
+            <field name="status">available</field>
+            <field name="stock">2</field>
+            <field name="location_rack">F-01</field>
+            <field name="sell_price">110000</field>
+            <field name="rent_price_per_day">7000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">1988</field>
+            <field name="pages">256</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1333578746i/3869.jpg</field>
+        </record>
+
+        <record id="book_09" model="rumah_buku.book">
+            <field name="name">Dilan: Dia Adalah Dilanku Tahun 1990</field>
+            <field name="isbn">978-602-7870-03-6</field>
+            <field name="author">Pidi Baiq</field>
+            <field name="publisher">Pastel Books</field>
+            <field name="synopsis">Kisah cinta remaja era 90-an yang penuh humor dan nostalgia di Kota Bandung.</field>
+            <field name="category">fiction</field>
+            <field name="status">borrowed</field>
+            <field name="stock">0</field>
+            <field name="location_rack">A-03</field>
+            <field name="sell_price">65000</field>
+            <field name="rent_price_per_day">4000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2014</field>
+            <field name="pages">332</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1486115628i/33518113.jpg</field>
+        </record>
+
+        <record id="book_10" model="rumah_buku.book">
+            <field name="name">The Lean Startup</field>
+            <field name="isbn">978-0-307-88789-4</field>
+            <field name="author">Eric Ries</field>
+            <field name="publisher">Crown Business</field>
+            <field name="synopsis">Metode ilmiah untuk menciptakan dan mengelola startup yang sukses di era ketidakpastian.</field>
+            <field name="category">tech_business</field>
+            <field name="status">available</field>
+            <field name="stock">5</field>
+            <field name="location_rack">C-02</field>
+            <field name="sell_price">140000</field>
+            <field name="rent_price_per_day">8000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2011</field>
+            <field name="pages">336</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1333576876i/10127019.jpg</field>
+        </record>
+
+        <record id="book_11" model="rumah_buku.book">
+            <field name="name">Perahu Kertas</field>
+            <field name="isbn">978-979-22-4740-1</field>
+            <field name="author">Dee Lestari</field>
+            <field name="publisher">Bentang Pustaka</field>
+            <field name="synopsis">Cerita tentang dua anak muda yang mengejar mimpi di bidang seni lukis dan musik.</field>
+            <field name="category">fiction</field>
+            <field name="status">available</field>
+            <field name="stock">4</field>
+            <field name="location_rack">A-04</field>
+            <field name="sell_price">70000</field>
+            <field name="rent_price_per_day">5000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2009</field>
+            <field name="pages">444</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1427646575i/6388879.jpg</field>
+        </record>
+
+        <record id="book_12" model="rumah_buku.book">
+            <field name="name">Cosmos</field>
+            <field name="isbn">978-0-345-53943-4</field>
+            <field name="author">Carl Sagan</field>
+            <field name="publisher">Ballantine Books</field>
+            <field name="synopsis">Perjalanan epik menjelajahi alam semesta dan tempat manusia di dalamnya.</field>
+            <field name="category">science</field>
+            <field name="status">available</field>
+            <field name="stock">3</field>
+            <field name="location_rack">F-02</field>
+            <field name="sell_price">125000</field>
+            <field name="rent_price_per_day">7000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">1980</field>
+            <field name="pages">432</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1388620656i/55030.jpg</field>
+        </record>
+
+        <record id="book_13" model="rumah_buku.book">
+            <field name="name">Negeri 5 Menara</field>
+            <field name="isbn">978-979-22-5787-5</field>
+            <field name="author">Ahmad Fuadi</field>
+            <field name="publisher">Gramedia Pustaka Utama</field>
+            <field name="synopsis">Kisah perjuangan enam santri yang bermimpi besar dari sebuah pesantren di pedalaman.</field>
+            <field name="category">fiction</field>
+            <field name="status">available</field>
+            <field name="stock">6</field>
+            <field name="location_rack">A-05</field>
+            <field name="sell_price">80000</field>
+            <field name="rent_price_per_day">5000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2009</field>
+            <field name="pages">423</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1296069695i/6584562.jpg</field>
+        </record>
+
+        <record id="book_14" model="rumah_buku.book">
+            <field name="name">Zero to One</field>
+            <field name="isbn">978-0-8041-3929-8</field>
+            <field name="author">Peter Thiel</field>
+            <field name="publisher">Crown Business</field>
+            <field name="synopsis">Catatan tentang startup dan bagaimana membangun masa depan yang berbeda dari sekedar menyalin yang sudah ada.</field>
+            <field name="category">tech_business</field>
+            <field name="status">available</field>
+            <field name="stock">4</field>
+            <field name="location_rack">C-03</field>
+            <field name="sell_price">130000</field>
+            <field name="rent_price_per_day">8000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">2014</field>
+            <field name="pages">224</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1414347376i/18050143.jpg</field>
+        </record>
+
+        <record id="book_15" model="rumah_buku.book">
+            <field name="name">Guns, Germs, and Steel</field>
+            <field name="isbn">978-0-393-31755-8</field>
+            <field name="author">Jared Diamond</field>
+            <field name="publisher">W. W. Norton</field>
+            <field name="synopsis">Analisis mengapa beberapa peradaban mendominasi yang lain berdasarkan geografi dan lingkungan.</field>
+            <field name="category">history</field>
+            <field name="status">available</field>
+            <field name="stock">2</field>
+            <field name="location_rack">D-02</field>
+            <field name="sell_price">160000</field>
+            <field name="rent_price_per_day">9000</field>
+            <field name="is_rentable" eval="True"/>
+            <field name="publication_year">1997</field>
+            <field name="pages">480</field>
+            <field name="cover_url">https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1453215833i/1842.jpg</field>
+        </record>
+    </data>
+</odoo>

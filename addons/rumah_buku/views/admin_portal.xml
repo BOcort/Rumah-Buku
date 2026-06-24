@@ -1,0 +1,942 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══════════════════════════════════════════════════════════
+         ADMIN LAYOUT — Sidebar + Main Content
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="admin_layout" name="Admin Layout">
+        &lt;!DOCTYPE html&gt;
+        <html class="light" lang="id">
+            <head>
+                <meta charset="utf-8"/>
+                <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+                <title>BukuRumah Admin Portal</title>
+                <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+                <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+                <script>
+                    tailwind.config = {
+                        darkMode: "class",
+                        theme: {
+                            extend: {
+                                colors: {
+                                    "primary": "#012425",
+                                    "on-primary": "#ffffff",
+                                    "primary-container": "#1a3a3a",
+                                    "on-primary-container": "#83a4a3",
+                                    "surface": "#f8f9fa",
+                                    "on-surface": "#191c1d",
+                                    "surface-variant": "#e1e3e4",
+                                    "on-surface-variant": "#414848",
+                                    "outline": "#717878",
+                                    "outline-variant": "#c1c8c7",
+                                    "background": "#f8f9fa",
+                                    "on-background": "#191c1d",
+                                    "surface-container": "#edeeef",
+                                    "surface-container-lowest": "#ffffff",
+                                    "surface-container-highest": "#e1e3e4",
+                                    "accent": "#D97706",
+                                    "accent-hover": "#B45309",
+                                },
+                                spacing: {
+                                    "xl": "64px", "lg": "40px", "md": "24px",
+                                    "sm": "12px", "xs": "4px", "base": "8px",
+                                },
+                                fontFamily: {
+                                    "headline-md": ["Playfair Display", "serif"],
+                                    "headline-lg": ["Playfair Display", "serif"],
+                                    "display": ["Playfair Display", "serif"],
+                                    "label-sm": ["Inter"], "body-md": ["Inter"],
+                                    "label-md": ["Inter"], "body-sm": ["Inter"],
+                                    "body-lg": ["Inter"],
+                                },
+                            }
+                        }
+                    }
+                </script>
+                <style>
+                    ::-webkit-scrollbar { width: 5px; }
+                    ::-webkit-scrollbar-track { background: transparent; }
+                    ::-webkit-scrollbar-thumb { background: #c1c8c7; border-radius: 3px; }
+                </style>
+            </head>
+            <body class="font-body-md text-on-surface flex h-screen overflow-hidden antialiased bg-background">
+                <!-- SideNavBar -->
+                <nav class="hidden md:flex bg-white flex-col h-full py-6 px-4 gap-1 w-64 flex-shrink-0 z-20 border-r border-outline-variant/30 shadow-sm">
+                    <!-- Brand -->
+                    <div class="mb-6 px-3">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+                            <h1 class="text-xl font-headline-md text-primary">BukuRumah</h1>
+                        </div>
+                        <p class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-1 ml-8">Admin Portal</p>
+                    </div>
+
+                    <!-- Admin Info -->
+                    <div class="flex items-center gap-3 mb-6 px-3 py-3 bg-surface-container rounded-xl">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                            <span class="text-on-primary text-sm font-bold"><t t-esc="request.env.user.name[:2].upper()"/></span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold truncate"><t t-esc="request.env.user.name"/></p>
+                            <p class="text-[10px] text-on-surface-variant">Management</p>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="flex-1 flex flex-col gap-0.5 overflow-y-auto">
+                        <a href="/admin/dashboard" t-attf-class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm {{ 'bg-primary text-on-primary font-semibold shadow-sm' if request.httprequest.path == '/admin/dashboard' else 'text-on-surface-variant hover:bg-surface-variant' }}">
+                            <span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard
+                        </a>
+                        <a href="/admin/inventory" t-attf-class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm {{ 'bg-primary text-on-primary font-semibold shadow-sm' if request.httprequest.path == '/admin/inventory' else 'text-on-surface-variant hover:bg-surface-variant' }}">
+                            <span class="material-symbols-outlined text-[20px]">menu_book</span> Inventory
+                        </a>
+                        <a href="/admin/users" t-attf-class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm {{ 'bg-primary text-on-primary font-semibold shadow-sm' if '/admin/users' in request.httprequest.path else 'text-on-surface-variant hover:bg-surface-variant' }}">
+                            <span class="material-symbols-outlined text-[20px]">group</span> User Management
+                        </a>
+                        <a href="/admin/transactions" t-attf-class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm {{ 'bg-primary text-on-primary font-semibold shadow-sm' if request.httprequest.path == '/admin/transactions' else 'text-on-surface-variant hover:bg-surface-variant' }}">
+                            <span class="material-symbols-outlined text-[20px]">receipt_long</span> Transactions
+                        </a>
+                        <a href="/admin/financial" t-attf-class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm {{ 'bg-primary text-on-primary font-semibold shadow-sm' if request.httprequest.path == '/admin/financial' else 'text-on-surface-variant hover:bg-surface-variant' }}">
+                            <span class="material-symbols-outlined text-[20px]">payments</span> Financial Reports
+                        </a>
+                        <a href="/admin/scan" t-attf-class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm {{ 'bg-primary text-on-primary font-semibold shadow-sm' if request.httprequest.path == '/admin/scan' else 'text-on-surface-variant hover:bg-surface-variant' }}">
+                            <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span> Scan QR Code
+                        </a>
+                    </div>
+
+                    <!-- Bottom -->
+                    <div class="flex flex-col gap-1 pt-4 border-t border-outline-variant/30">
+                        <a href="/web/session/logout" class="flex items-center gap-3 px-3 py-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all text-sm">
+                            <span class="material-symbols-outlined text-[20px]">logout</span> Logout
+                        </a>
+                    </div>
+                </nav>
+
+                <!-- Main Content -->
+                <main class="flex-1 overflow-y-auto p-6 md:p-8 bg-[#F9FAFB]">
+                    <t t-out="0"/>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ADMIN DASHBOARD
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="admin_dashboard" name="Admin Dashboard">
+        <t t-call="rumah_buku.admin_layout">
+            <header class="mb-8 flex justify-between items-end">
+                <div>
+                    <h2 class="text-2xl font-headline-lg text-primary">Dashboard Overview</h2>
+                    <p class="text-sm text-on-surface-variant mt-1">Welcome back. Here's what's happening today.</p>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                <div class="bg-white shadow-sm rounded-xl p-5 border border-outline-variant/20 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-3">
+                        <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Total Books</p>
+                        <span class="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded-lg text-[18px]">library_books</span>
+                    </div>
+                    <h3 class="text-3xl font-headline-md text-on-surface"><t t-esc="metrics['total_books']"/></h3>
+                </div>
+                <div class="bg-white shadow-sm rounded-xl p-5 border border-outline-variant/20 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-3">
+                        <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Active Rentals</p>
+                        <span class="material-symbols-outlined text-[#1565C0] bg-[#E3F2FD] p-1.5 rounded-lg text-[18px]">book_online</span>
+                    </div>
+                    <h3 class="text-3xl font-headline-md text-on-surface"><t t-esc="metrics['active_rentals']"/></h3>
+                </div>
+                <div class="bg-white shadow-sm rounded-xl p-5 border border-outline-variant/20 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-3">
+                        <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Total Sales</p>
+                        <span class="material-symbols-outlined text-[#2E7D32] bg-[#E8F5E9] p-1.5 rounded-lg text-[18px]">payments</span>
+                    </div>
+                    <h3 class="text-3xl font-headline-md text-on-surface">Rp <t t-esc="'{:,.0f}'.format(metrics['total_sales'])"/></h3>
+                </div>
+                <div class="bg-white shadow-sm rounded-xl p-5 border border-outline-variant/20 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-3">
+                        <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold">Outstanding Fines</p>
+                        <span class="material-symbols-outlined text-accent bg-accent/10 p-1.5 rounded-lg text-[18px]">warning</span>
+                    </div>
+                    <h3 class="text-3xl font-headline-md text-accent">Rp <t t-esc="'{:,.0f}'.format(metrics['outstanding_fines'])"/></h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Transactions Table -->
+                <div class="lg:col-span-2 bg-white shadow-sm rounded-xl border border-outline-variant/20 overflow-hidden">
+                    <div class="p-5 border-b border-outline-variant/20 flex justify-between items-center">
+                        <h3 class="text-lg font-headline-md text-primary">Recent Transactions</h3>
+                        <a href="/admin/transactions" class="text-xs text-primary hover:underline font-semibold">View All →</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#f9fafb] text-[10px] text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/20">
+                                    <th class="p-3 pl-5 font-semibold">ID</th>
+                                    <th class="p-3 font-semibold">Book</th>
+                                    <th class="p-3 font-semibold">User</th>
+                                    <th class="p-3 font-semibold">Type</th>
+                                    <th class="p-3 font-semibold">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <t t-foreach="recent_transactions" t-as="tx">
+                                    <tr class="border-b border-outline-variant/10 hover:bg-[#f9fafb] transition-colors">
+                                        <td class="p-3 pl-5 font-medium text-on-surface-variant">#<t t-esc="tx.id"/></td>
+                                        <td class="p-3 text-on-surface font-medium truncate max-w-[150px]"><t t-esc="tx.book_id.name"/></td>
+                                        <td class="p-3 text-on-surface-variant"><t t-esc="tx.user_id.name"/></td>
+                                        <td class="p-3"><span class="capitalize text-xs"><t t-esc="tx.transaction_type"/></span></td>
+                                        <td class="p-3">
+                                            <span t-attf-class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ 'bg-[#dcfce7] text-[#166534]' if tx.status in ['completed', 'borrowed'] else 'bg-accent/10 text-accent' if tx.status == 'ready_for_pickup' else 'bg-red-100 text-red-700' }}"><t t-esc="tx.status"/></span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white shadow-sm rounded-xl border border-outline-variant/20 p-5 flex flex-col gap-3 h-fit">
+                    <h3 class="text-lg font-headline-md text-primary border-b border-outline-variant/20 pb-3">Quick Actions</h3>
+                    <a href="/admin/scan" class="w-full flex items-center justify-center gap-2 bg-primary text-on-primary py-2.5 px-4 rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors shadow-sm">
+                        <span class="material-symbols-outlined text-[18px]">qr_code_scanner</span> Scan QR Code
+                    </a>
+                    <a href="/admin/inventory" class="w-full flex items-center justify-center gap-2 bg-surface-container text-on-surface py-2.5 px-4 rounded-lg text-sm font-semibold hover:bg-surface-variant transition-colors border border-outline-variant/30">
+                        <span class="material-symbols-outlined text-[18px]">add_box</span> Manage Inventory
+                    </a>
+                    <div class="mt-3 p-3 bg-[#f9fafb] rounded-lg border border-outline-variant/20">
+                        <p class="text-[10px] font-semibold text-on-surface mb-1.5 uppercase tracking-widest">System Status</p>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-[#2E7D32] animate-pulse"></span>
+                            <span class="text-xs text-on-surface-variant">All systems operational</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ADMIN INVENTORY
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="admin_inventory" name="Admin Inventory">
+        <t t-call="rumah_buku.admin_layout">
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h2 class="text-2xl font-headline-lg text-on-surface">Inventory Management</h2>
+                    <p class="text-sm text-on-surface-variant mt-1">Manage your modern literary collection.</p>
+                </div>
+            </header>
+
+            <!-- Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-outline-variant/20">
+                    <div class="flex items-center justify-between text-on-surface-variant mb-2">
+                        <span class="text-[10px] font-semibold uppercase tracking-widest">Total Titles</span>
+                        <span class="material-symbols-outlined text-[18px]">library_books</span>
+                    </div>
+                    <span class="text-3xl font-headline-lg text-on-surface"><t t-esc="total"/></span>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-outline-variant/20">
+                    <div class="flex items-center justify-between text-on-surface-variant mb-2">
+                        <span class="text-[10px] font-semibold uppercase tracking-widest">Currently Borrowed</span>
+                        <span class="material-symbols-outlined text-[18px]">compare_arrows</span>
+                    </div>
+                    <span class="text-3xl font-headline-lg text-primary"><t t-esc="borrowed_count"/></span>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-outline-variant/20">
+                    <div class="flex items-center justify-between text-on-surface-variant mb-2">
+                        <span class="text-[10px] font-semibold uppercase tracking-widest">Low Stock Alerts</span>
+                        <span class="material-symbols-outlined text-accent text-[18px]">warning</span>
+                    </div>
+                    <span class="text-3xl font-headline-lg text-accent"><t t-esc="low_stock"/></span>
+                </div>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="flex flex-col md:flex-row gap-3 mb-6">
+                <form action="/admin/inventory" method="GET" class="flex-1 flex gap-3">
+                    <div class="relative flex-1">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+                        <input type="text" name="search" t-att-value="search" placeholder="Search books..." class="w-full pl-9 pr-4 py-2 rounded-lg border border-outline-variant bg-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"/>
+                    </div>
+                    <button type="submit" class="bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-semibold">Search</button>
+                </form>
+            </div>
+
+            <!-- Book Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-outline-variant/20 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead class="bg-[#f9fafb] border-b border-outline-variant/20">
+                            <tr>
+                                <th class="p-4 text-[10px] text-on-surface-variant uppercase font-semibold tracking-widest">Book Details</th>
+                                <th class="p-4 text-[10px] text-on-surface-variant uppercase font-semibold tracking-widest">ISBN</th>
+                                <th class="p-4 text-[10px] text-on-surface-variant uppercase font-semibold tracking-widest">Category</th>
+                                <th class="p-4 text-[10px] text-on-surface-variant uppercase font-semibold tracking-widest">Stock</th>
+                                <th class="p-4 text-[10px] text-on-surface-variant uppercase font-semibold tracking-widest">Status</th>
+                                <th class="p-4 text-[10px] text-on-surface-variant uppercase font-semibold tracking-widest">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant/10">
+                            <t t-foreach="books" t-as="book">
+                                <tr class="hover:bg-[#f9fafb] transition-colors">
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-14 bg-surface-variant rounded flex-shrink-0 border border-outline-variant/20 overflow-hidden">
+                                                <img t-att-src="book.cover_display_url" class="w-full h-full object-cover" alt=""/>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-semibold text-on-surface line-clamp-1"><t t-esc="book.name"/></p>
+                                                <p class="text-xs text-on-surface-variant"><t t-esc="book.author"/></p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-xs text-on-surface-variant"><t t-esc="book.isbn or '-'"/></td>
+                                    <td class="p-4 text-xs text-on-surface">
+                                        <t t-esc="dict(book._fields['category'].selection).get(book.category, '-')"/>
+                                    </td>
+                                    <td class="p-4 text-sm text-on-surface font-medium"><t t-esc="book.stock"/></td>
+                                    <td class="p-4">
+                                        <span t-attf-class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ 'bg-[#dcfce7] text-[#166534]' if book.status == 'available' else 'bg-accent/10 text-accent' if book.status == 'borrowed' else 'bg-red-100 text-red-700' }}">
+                                            <t t-esc="book.status"/>
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-sm text-on-surface font-medium">Rp <t t-esc="'{:,.0f}'.format(book.sell_price)"/></td>
+                                </tr>
+                            </t>
+                            <t t-if="len(books) == 0">
+                                <tr><td colspan="6" class="p-8 text-center text-on-surface-variant text-sm">No books found.</td></tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <t t-if="total_pages > 1">
+                <div class="flex items-center justify-between mt-5 text-sm">
+                    <p class="text-on-surface-variant text-xs">Showing <t t-esc="(page - 1) * per_page + 1"/>–<t t-esc="min(page * per_page, total)"/> of <t t-esc="total"/> entries</p>
+                    <div class="flex gap-1">
+                        <t t-if="page > 1">
+                            <a t-attf-href="/admin/inventory?search={{search}}&amp;page={{page-1}}" class="px-3 py-1 rounded border border-outline-variant hover:bg-surface-variant text-xs">Prev</a>
+                        </t>
+                        <t t-foreach="range(1, total_pages + 1)" t-as="p">
+                            <a t-attf-href="/admin/inventory?search={{search}}&amp;page={{p}}" t-attf-class="px-3 py-1 rounded text-xs {{ 'bg-primary text-on-primary' if p == page else 'border border-outline-variant hover:bg-surface-variant' }}"><t t-esc="p"/></a>
+                        </t>
+                        <t t-if="page &lt; total_pages">
+                            <a t-attf-href="/admin/inventory?search={{search}}&amp;page={{page+1}}" class="px-3 py-1 rounded border border-outline-variant hover:bg-surface-variant text-xs">Next</a>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ADMIN USERS
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="admin_users" name="Admin Users">
+        <t t-call="rumah_buku.admin_layout">
+            <header class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-2xl font-headline-lg text-on-surface">User Management</h2>
+                    <p class="text-sm text-on-surface-variant mt-1">Manage library members, staff roles, and account statuses.</p>
+                </div>
+                <a href="/admin/users/create-admin" class="bg-primary text-on-primary text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-primary-container transition-colors flex items-center gap-2 shadow-sm">
+                    <span class="material-symbols-outlined text-[18px]">person_add</span> Add Admin
+                </a>
+            </header>
+
+            <!-- Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-outline-variant/20">
+                    <span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest">Total Users</span>
+                    <div class="text-3xl font-headline-lg text-primary mt-2"><t t-esc="total"/></div>
+                </div>
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-outline-variant/20">
+                    <span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest">Active Members</span>
+                    <div class="text-3xl font-headline-lg text-[#2E7D32] mt-2"><t t-esc="active_count"/></div>
+                </div>
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-outline-variant/20">
+                    <span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest">Suspended</span>
+                    <div class="text-3xl font-headline-lg text-red-600 mt-2"><t t-esc="total - active_count"/></div>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <form action="/admin/users" method="GET" class="flex gap-3 mb-6">
+                <div class="relative flex-1">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+                    <input type="text" name="search" t-att-value="search" placeholder="Search by name or email..." class="w-full pl-9 pr-4 py-2 rounded-lg border border-outline-variant bg-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"/>
+                </div>
+                <button type="submit" class="bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-semibold">Search</button>
+            </form>
+
+            <!-- Users Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-outline-variant/20 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="border-b border-outline-variant/20 bg-[#f9fafb]">
+                                <th class="px-5 py-3 text-[10px] font-semibold uppercase text-on-surface-variant tracking-widest">User</th>
+                                <th class="px-5 py-3 text-[10px] font-semibold uppercase text-on-surface-variant tracking-widest">Role</th>
+                                <th class="px-5 py-3 text-[10px] font-semibold uppercase text-on-surface-variant tracking-widest">Email</th>
+                                <th class="px-5 py-3 text-[10px] font-semibold uppercase text-on-surface-variant tracking-widest">Status</th>
+                                <th class="px-5 py-3 text-[10px] font-semibold uppercase text-on-surface-variant tracking-widest text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm text-on-surface divide-y divide-outline-variant/10">
+                            <t t-foreach="users" t-as="user">
+                                <tr class="hover:bg-[#f9fafb] transition-colors">
+                                    <td class="px-5 py-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0">
+                                                <span class="text-on-primary text-xs font-bold"><t t-esc="user.name[:2].upper()"/></span>
+                                            </div>
+                                            <div>
+                                                <div class="font-medium text-on-surface text-sm"><t t-esc="user.name"/></div>
+                                                <div class="text-[11px] text-on-surface-variant"><t t-esc="user.login"/></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-3">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-variant text-on-surface text-[10px] uppercase font-bold tracking-wider">
+                                            <t t-esc="user.role or 'user'"/>
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3 text-on-surface-variant text-xs"><t t-esc="user.email or '-'"/></td>
+                                    <td class="px-5 py-3">
+                                        <div class="flex items-center gap-1.5">
+                                            <span t-attf-class="w-2 h-2 rounded-full {{ 'bg-[#2E7D32]' if not user.is_suspended else 'bg-red-500' }}"></span>
+                                            <span class="text-xs"><t t-if="not user.is_suspended">Active</t><t t-else="">Suspended</t></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-3 text-right">
+                                        <form action="/admin/users/suspend" method="POST" class="inline">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <input type="hidden" name="user_id" t-att-value="user.id"/>
+                                            <button type="submit" t-attf-class="px-3 py-1 rounded text-xs font-semibold transition-colors {{ 'bg-red-100 text-red-700 hover:bg-red-200' if not user.is_suspended else 'bg-[#dcfce7] text-[#166534] hover:bg-[#bbf7d0]' }}">
+                                                <t t-if="not user.is_suspended">Suspend</t>
+                                                <t t-else="">Activate</t>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="len(users) == 0">
+                                <tr><td colspan="5" class="p-8 text-center text-on-surface-variant text-sm">No users found.</td></tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <t t-if="total_pages > 1">
+                <div class="flex items-center justify-between mt-5 text-xs">
+                    <p class="text-on-surface-variant">Showing <t t-esc="(page-1)*per_page+1"/>–<t t-esc="min(page*per_page,total)"/> of <t t-esc="total"/></p>
+                    <div class="flex gap-1">
+                        <t t-foreach="range(1, total_pages+1)" t-as="p">
+                            <a t-attf-href="/admin/users?search={{search}}&amp;page={{p}}" t-attf-class="px-3 py-1 rounded {{ 'bg-primary text-on-primary' if p == page else 'border border-outline-variant hover:bg-surface-variant' }}"><t t-esc="p"/></a>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ADMIN CREATE ADMIN
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="admin_create_admin" name="Create Admin">
+        <t t-call="rumah_buku.admin_layout">
+            <div class="max-w-lg">
+                <a href="/admin/users" class="text-sm text-on-surface-variant hover:text-primary flex items-center gap-1 mb-6">
+                    <span class="material-symbols-outlined text-[16px]">arrow_back</span> Back to User Management
+                </a>
+                <h2 class="text-2xl font-headline-lg text-primary mb-6">Create New Admin</h2>
+
+                <t t-if="error">
+                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-5 text-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">error</span> <t t-esc="error"/>
+                    </div>
+                </t>
+                <t t-if="success">
+                    <div class="bg-[#dcfce7] border border-[#bbf7d0] text-[#166534] px-4 py-3 rounded-lg mb-5 text-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">check_circle</span> <t t-esc="success"/>
+                    </div>
+                </t>
+
+                <form action="/admin/users/create-admin" method="POST" class="bg-white rounded-xl shadow-sm border border-outline-variant/20 p-6 space-y-5">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div>
+                        <label class="block text-sm font-medium text-on-surface mb-1.5">Full Name</label>
+                        <input type="text" name="name" required="True" class="w-full border border-outline-variant rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Admin name"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-on-surface mb-1.5">Email / Login</label>
+                        <input type="email" name="login" required="True" class="w-full border border-outline-variant rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="admin@bukurumah.com"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-on-surface mb-1.5">Password</label>
+                        <input type="password" name="password" required="True" class="w-full border border-outline-variant rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Secure password"/>
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-lg font-semibold hover:bg-primary-container transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">person_add</span> Create Admin Account
+                    </button>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ADMIN TRANSACTIONS
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="admin_transactions" name="Admin Transactions">
+        <t t-call="rumah_buku.admin_layout">
+            <header class="mb-8">
+                <h2 class="text-2xl font-headline-lg text-on-surface">All Transactions</h2>
+                <p class="text-sm text-on-surface-variant mt-1">Monitor all borrow and purchase activities.</p>
+            </header>
+
+            <!-- Search -->
+            <form action="/admin/transactions" method="GET" class="flex flex-col md:flex-row gap-3 mb-6">
+                <div class="relative flex-1">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+                    <input type="text" name="search" t-att-value="search" placeholder="Search by book title, user, or transaction ID..." class="w-full pl-9 pr-4 py-2 rounded-lg border border-outline-variant bg-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"/>
+                </div>
+                <select name="status" class="bg-white border border-outline-variant rounded-lg px-3 py-2 text-sm focus:border-primary outline-none">
+                    <option value="">All Status</option>
+                    <option value="ready_for_pickup" t-att-selected="status_filter == 'ready_for_pickup'">Ready for Pickup</option>
+                    <option value="borrowed" t-att-selected="status_filter == 'borrowed'">Borrowed</option>
+                    <option value="completed" t-att-selected="status_filter == 'completed'">Completed</option>
+                    <option value="cancelled" t-att-selected="status_filter == 'cancelled'">Cancelled</option>
+                </select>
+                <select name="tx_type" class="bg-white border border-outline-variant rounded-lg px-3 py-2 text-sm focus:border-primary outline-none">
+                    <option value="">All Types</option>
+                    <option value="borrow" t-att-selected="type_filter == 'borrow'">Borrow</option>
+                    <option value="buy" t-att-selected="type_filter == 'buy'">Buy</option>
+                </select>
+                <button type="submit" class="bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-semibold">Filter</button>
+            </form>
+
+            <!-- Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-outline-variant/20 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="bg-[#f9fafb] text-[10px] font-semibold uppercase text-on-surface-variant tracking-widest border-b border-outline-variant/20">
+                                <th class="p-4">ID</th>
+                                <th class="p-4">Book</th>
+                                <th class="p-4">User</th>
+                                <th class="p-4">Type</th>
+                                <th class="p-4">Amount</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-outline-variant/10">
+                            <t t-foreach="transactions" t-as="tx">
+                                <tr class="hover:bg-[#f9fafb] transition-colors">
+                                    <td class="p-4 font-medium text-on-surface-variant">#<t t-esc="tx.id"/></td>
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-11 bg-surface-variant rounded overflow-hidden shrink-0">
+                                                <img t-att-src="tx.book_id.cover_display_url" class="w-full h-full object-cover" alt=""/>
+                                            </div>
+                                            <span class="text-on-surface font-medium truncate max-w-[150px]"><t t-esc="tx.book_id.name"/></span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-on-surface-variant"><t t-esc="tx.user_id.name"/></td>
+                                    <td class="p-4 capitalize"><t t-esc="tx.transaction_type"/></td>
+                                    <td class="p-4 font-semibold">Rp <t t-esc="'{:,.0f}'.format(tx.total_amount)"/></td>
+                                    <td class="p-4">
+                                        <span t-attf-class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ 'bg-[#dcfce7] text-[#166534]' if tx.status == 'completed' else 'bg-[#E3F2FD] text-[#1565C0]' if tx.status == 'borrowed' else 'bg-accent/10 text-accent' if tx.status == 'ready_for_pickup' else 'bg-red-100 text-red-700' }}">
+                                            <t t-esc="tx.status"/>
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-xs text-on-surface-variant"><t t-esc="tx.create_date.strftime('%d %b %Y')"/></td>
+                                </tr>
+                            </t>
+                            <t t-if="len(transactions) == 0">
+                                <tr><td colspan="7" class="p-8 text-center text-on-surface-variant text-sm">No transactions found.</td></tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <t t-if="total_pages > 1">
+                <div class="flex items-center justify-between mt-5 text-xs">
+                    <p class="text-on-surface-variant">Showing <t t-esc="(page-1)*per_page+1"/>–<t t-esc="min(page*per_page,total)"/> of <t t-esc="total"/></p>
+                    <div class="flex gap-1">
+                        <t t-foreach="range(1, total_pages+1)" t-as="p">
+                            <a t-attf-href="/admin/transactions?search={{search}}&amp;status={{status_filter}}&amp;tx_type={{type_filter}}&amp;page={{p}}" t-attf-class="px-3 py-1 rounded {{ 'bg-primary text-on-primary' if p == page else 'border border-outline-variant hover:bg-surface-variant' }}"><t t-esc="p"/></a>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ADMIN FINANCIAL REPORTS
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="admin_financial" name="Admin Financial">
+        <t t-call="rumah_buku.admin_layout">
+            <header class="mb-8">
+                <h1 class="text-2xl font-headline-lg text-on-surface">Financial Reports</h1>
+                <p class="text-sm text-on-surface-variant mt-1">Overview of revenue, transactions, and library economics.</p>
+            </header>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                <div class="bg-[#FDFBF7] p-5 rounded-xl shadow-sm border border-outline-variant/20">
+                    <div class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest mb-2">Total Earnings</div>
+                    <div class="text-2xl font-headline-md text-primary">Rp <t t-esc="'{:,.0f}'.format(total_earnings)"/></div>
+                </div>
+                <div class="bg-[#FDFBF7] p-5 rounded-xl shadow-sm border border-outline-variant/20">
+                    <div class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest mb-2">Sales Revenue</div>
+                    <div class="text-2xl font-headline-md text-on-surface">Rp <t t-esc="'{:,.0f}'.format(sales_revenue)"/></div>
+                </div>
+                <div class="bg-[#FDFBF7] p-5 rounded-xl shadow-sm border border-outline-variant/20">
+                    <div class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest mb-2">Rental Income</div>
+                    <div class="text-2xl font-headline-md text-on-surface">Rp <t t-esc="'{:,.0f}'.format(rental_income)"/></div>
+                </div>
+                <div class="bg-[#FDFBF7] p-5 rounded-xl shadow-sm border border-outline-variant/20">
+                    <div class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest mb-2">Fines Collected</div>
+                    <div class="text-2xl font-headline-md text-accent">Rp <t t-esc="'{:,.0f}'.format(fines_collected)"/></div>
+                </div>
+            </div>
+
+            <!-- Revenue Visualization (Pure CSS bars) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-sm border border-outline-variant/20 p-5">
+                    <h3 class="text-lg font-headline-md text-primary mb-5">Revenue Breakdown</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-on-surface-variant">Sales</span>
+                                <span class="font-semibold">Rp <t t-esc="'{:,.0f}'.format(sales_revenue)"/></span>
+                            </div>
+                            <div class="w-full bg-surface-container rounded-full h-3 overflow-hidden">
+                                <div class="bg-primary h-full rounded-full transition-all duration-500" t-attf-style="width: {{ (sales_revenue / max(total_earnings, 1)) * 100 }}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-on-surface-variant">Rentals</span>
+                                <span class="font-semibold">Rp <t t-esc="'{:,.0f}'.format(rental_income)"/></span>
+                            </div>
+                            <div class="w-full bg-surface-container rounded-full h-3 overflow-hidden">
+                                <div class="bg-[#1565C0] h-full rounded-full transition-all duration-500" t-attf-style="width: {{ (rental_income / max(total_earnings, 1)) * 100 }}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-on-surface-variant">Fines</span>
+                                <span class="font-semibold">Rp <t t-esc="'{:,.0f}'.format(fines_collected)"/></span>
+                            </div>
+                            <div class="w-full bg-surface-container rounded-full h-3 overflow-hidden">
+                                <div class="bg-accent h-full rounded-full transition-all duration-500" t-attf-style="width: {{ (fines_collected / max(total_earnings, 1)) * 100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-outline-variant/20 p-5 flex flex-col items-center justify-center">
+                    <h3 class="text-lg font-headline-md text-primary mb-5 self-start">Summary</h3>
+                    <div class="grid grid-cols-2 gap-6 w-full">
+                        <div class="text-center p-4 bg-[#f9fafb] rounded-xl">
+                            <div class="text-3xl font-headline-md text-primary"><t t-esc="len(transactions)"/></div>
+                            <div class="text-xs text-on-surface-variant mt-1">Total Transactions</div>
+                        </div>
+                        <div class="text-center p-4 bg-[#f9fafb] rounded-xl">
+                            <div class="text-3xl font-headline-md text-[#2E7D32]">
+                                Rp <t t-esc="'{:,.0f}'.format(total_earnings / max(len(transactions), 1))"/>
+                            </div>
+                            <div class="text-xs text-on-surface-variant mt-1">Avg per Transaction</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-outline-variant/20 overflow-hidden">
+                <div class="p-5 border-b border-outline-variant/20">
+                    <h2 class="text-lg font-headline-md text-on-surface">Recent Transactions</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="bg-[#f9fafb] text-[10px] font-semibold uppercase text-on-surface-variant tracking-widest">
+                                <th class="p-4 border-b border-outline-variant/20">ID</th>
+                                <th class="p-4 border-b border-outline-variant/20">Book</th>
+                                <th class="p-4 border-b border-outline-variant/20">Type</th>
+                                <th class="p-4 border-b border-outline-variant/20">Amount</th>
+                                <th class="p-4 border-b border-outline-variant/20">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-outline-variant/10">
+                            <t t-foreach="transactions" t-as="tx">
+                                <tr class="hover:bg-[#f9fafb] transition-colors">
+                                    <td class="p-4">#<t t-esc="tx.id"/></td>
+                                    <td class="p-4 text-on-surface-variant"><t t-esc="tx.book_id.name"/></td>
+                                    <td class="p-4 capitalize"><t t-esc="tx.transaction_type"/></td>
+                                    <td class="p-4 font-semibold">Rp <t t-esc="'{:,.0f}'.format(tx.total_amount)"/></td>
+                                    <td class="p-4">
+                                        <span t-attf-class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ 'bg-[#dcfce7] text-[#166534]' if tx.status == 'completed' else 'bg-[#E3F2FD] text-[#1565C0]' if tx.status == 'borrowed' else 'bg-accent/10 text-accent' }}">
+                                            <t t-esc="tx.status"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="len(transactions) == 0">
+                                <tr><td colspan="5" class="p-8 text-center text-on-surface-variant text-sm">No transactions found.</td></tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ADMIN QR SCANNER
+         ═══════════════════════════════════════════════════════════ -->
+    <template id="admin_scan_qr" name="Admin Scan QR">
+        <t t-call="rumah_buku.admin_layout">
+            <header class="mb-8">
+                <h2 class="text-2xl font-headline-lg text-primary">Scan QR Code</h2>
+                <p class="text-sm text-on-surface-variant mt-1">Scan a member's QR code to confirm book pickup or verify transactions.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Camera Scanner -->
+                <div class="bg-white rounded-xl shadow-sm border border-outline-variant/20 p-6">
+                    <h3 class="text-lg font-headline-md text-primary mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">photo_camera</span> Camera Scanner
+                    </h3>
+                    <div id="qr-reader" class="w-full aspect-square bg-[#f9fafb] rounded-xl border-2 border-dashed border-outline-variant flex items-center justify-center mb-4 overflow-hidden">
+                        <div id="qr-placeholder" class="text-center p-6">
+                            <span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-3 block">qr_code_scanner</span>
+                            <p class="text-sm text-on-surface-variant">Click "Start Scanner" to begin</p>
+                        </div>
+                        <video id="qr-video" class="w-full h-full object-cover hidden" autoplay="True" playsinline="True"></video>
+                        <canvas id="qr-canvas" class="hidden"></canvas>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="startScanner()" id="btn-start" class="flex-1 bg-primary text-on-primary py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary-container transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">videocam</span> Start Scanner
+                        </button>
+                        <button onclick="stopScanner()" id="btn-stop" class="flex-1 bg-red-100 text-red-700 py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-red-200 transition-colors hidden">
+                            <span class="material-symbols-outlined text-[18px]">videocam_off</span> Stop
+                        </button>
+                    </div>
+
+                    <!-- Or manual input -->
+                    <div class="mt-6 pt-5 border-t border-outline-variant/20">
+                        <p class="text-xs text-on-surface-variant mb-3 font-semibold uppercase tracking-widest">Or enter QR token manually</p>
+                        <div class="flex gap-2">
+                            <input type="text" id="manual-token" placeholder="Paste QR token here..." class="flex-1 border border-outline-variant rounded-lg px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"/>
+                            <button onclick="verifyToken(document.getElementById('manual-token').value)" class="bg-primary text-on-primary px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors">Verify</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scan Result -->
+                <div id="scan-result" class="bg-white rounded-xl shadow-sm border border-outline-variant/20 p-6 hidden">
+                    <h3 class="text-lg font-headline-md text-primary mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">assignment</span> Transaction Details
+                    </h3>
+                    <div id="result-content"></div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="scan-empty" class="bg-white rounded-xl shadow-sm border border-outline-variant/20 p-6 flex flex-col items-center justify-center text-center min-h-[300px]">
+                    <span class="material-symbols-outlined text-6xl text-on-surface-variant/20 mb-4">document_scanner</span>
+                    <p class="text-on-surface-variant text-sm">Scan a QR code or enter a token to see transaction details.</p>
+                </div>
+            </div>
+
+            <script>
+                let videoStream = null;
+                let scanInterval = null;
+
+                async function startScanner() {
+                    try {
+                        const video = document.getElementById('qr-video');
+                        const placeholder = document.getElementById('qr-placeholder');
+
+                        videoStream = await navigator.mediaDevices.getUserMedia({
+                            video: { facingMode: 'environment' }
+                        });
+
+                        video.srcObject = videoStream;
+                        video.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
+
+                        document.getElementById('btn-start').classList.add('hidden');
+                        document.getElementById('btn-stop').classList.remove('hidden');
+
+                        // Simple frame scanning using canvas
+                        const canvas = document.getElementById('qr-canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        scanInterval = setInterval(() => {
+                            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                                canvas.width = video.videoWidth;
+                                canvas.height = video.videoHeight;
+                                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                // Note: Full QR decoding requires a JS library.
+                                // For now, admin can use the manual input for the token.
+                            }
+                        }, 500);
+
+                    } catch (err) {
+                        alert('Camera access denied or not available. Please use manual token input.');
+                    }
+                }
+
+                function stopScanner() {
+                    if (videoStream) {
+                        videoStream.getTracks().forEach(t => t.stop());
+                        videoStream = null;
+                    }
+                    if (scanInterval) {
+                        clearInterval(scanInterval);
+                        scanInterval = null;
+                    }
+
+                    const video = document.getElementById('qr-video');
+                    const placeholder = document.getElementById('qr-placeholder');
+                    video.classList.add('hidden');
+                    placeholder.classList.remove('hidden');
+
+                    document.getElementById('btn-start').classList.remove('hidden');
+                    document.getElementById('btn-stop').classList.add('hidden');
+                }
+
+                async function verifyToken(token) {
+                    if (!token || !token.trim()) {
+                        alert('Please enter a valid QR token.');
+                        return;
+                    }
+
+                    try {
+                        const res = await fetch('/api/qr/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: token.trim() })
+                        });
+
+                        const data = await res.json();
+
+                        if (data.error) {
+                            document.getElementById('scan-result').classList.remove('hidden');
+                            document.getElementById('scan-empty').classList.add('hidden');
+                            document.getElementById('result-content').innerHTML = `
+                                <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm flex items-center gap-2">
+                                    <span class="material-symbols-outlined">error</span> ${data.error}
+                                </div>`;
+                            return;
+                        }
+
+                        const tx = data.transaction;
+                        const isPickupReady = tx.current_status === 'ready_for_pickup';
+
+                        document.getElementById('scan-result').classList.remove('hidden');
+                        document.getElementById('scan-empty').classList.add('hidden');
+                        document.getElementById('result-content').innerHTML = `
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-4 p-4 bg-[#f9fafb] rounded-xl">
+                                    <img src="${tx.cover_url}" class="w-16 h-22 object-cover rounded border" onerror="this.src='/rumah_buku/static/src/img/no_cover.png'"/>
+                                    <div>
+                                        <h4 class="font-semibold text-on-surface">${tx.book_title}</h4>
+                                        <p class="text-xs text-on-surface-variant">${tx.book_author}</p>
+                                        <p class="text-xs text-on-surface-variant mt-1">Transaction: ${tx.name}</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 text-sm">
+                                    <div class="p-3 bg-[#f9fafb] rounded-lg">
+                                        <span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold mb-0.5">Member</span>
+                                        <span class="font-medium">${tx.user_name}</span>
+                                    </div>
+                                    <div class="p-3 bg-[#f9fafb] rounded-lg">
+                                        <span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold mb-0.5">Email</span>
+                                        <span class="font-medium">${tx.user_email}</span>
+                                    </div>
+                                    <div class="p-3 bg-[#f9fafb] rounded-lg">
+                                        <span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold mb-0.5">Type</span>
+                                        <span class="font-medium capitalize">${tx.type}</span>
+                                    </div>
+                                    <div class="p-3 bg-[#f9fafb] rounded-lg">
+                                        <span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold mb-0.5">Amount</span>
+                                        <span class="font-medium">Rp ${new Intl.NumberFormat('id-ID').format(tx.total_amount)}</span>
+                                    </div>
+                                    <div class="p-3 bg-[#f9fafb] rounded-lg">
+                                        <span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold mb-0.5">Status</span>
+                                        <span class="font-medium capitalize">${tx.current_status.replace(/_/g, ' ')}</span>
+                                    </div>
+                                    <div class="p-3 bg-[#f9fafb] rounded-lg">
+                                        <span class="block text-[10px] text-on-surface-variant uppercase tracking-widest font-semibold mb-0.5">Duration</span>
+                                        <span class="font-medium">${tx.borrow_duration} days</span>
+                                    </div>
+                                </div>
+                                ${isPickupReady ? `
+                                <button onclick="confirmPickup('${token.trim()}')" class="w-full bg-[#2E7D32] text-white py-3 rounded-lg font-semibold text-sm hover:bg-[#1B5E20] transition-colors flex items-center justify-center gap-2 shadow-sm mt-2">
+                                    <span class="material-symbols-outlined text-[18px]">check_circle</span> Confirm Book Pickup
+                                </button>
+                                ` : `
+                                <div class="bg-[#E3F2FD] text-[#1565C0] p-3 rounded-lg text-sm text-center font-medium">
+                                    This transaction is already in "${tx.current_status.replace(/_/g, ' ')}" status.
+                                </div>
+                                `}
+                            </div>`;
+
+                    } catch (err) {
+                        alert('Network error. Please try again.');
+                    }
+                }
+
+                async function confirmPickup(token) {
+                    try {
+                        const res = await fetch('/api/qr/confirm-pickup', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: token })
+                        });
+
+                        const data = await res.json();
+
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                            return;
+                        }
+
+                        document.getElementById('result-content').innerHTML = `
+                            <div class="text-center py-6">
+                                <div class="w-16 h-16 bg-[#dcfce7] text-[#166534] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="material-symbols-outlined text-4xl">check_circle</span>
+                                </div>
+                                <h4 class="text-xl font-headline-md text-primary mb-2">Pickup Confirmed!</h4>
+                                <p class="text-sm text-on-surface-variant mb-1">${data.message}</p>
+                                <p class="text-sm text-on-surface-variant">Due date: <strong>${data.due_date}</strong></p>
+                                <button onclick="location.reload()" class="mt-6 bg-primary text-on-primary px-6 py-2 rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors">
+                                    Scan Another
+                                </button>
+                            </div>`;
+
+                    } catch (err) {
+                        alert('Network error. Please try again.');
+                    }
+                }
+            </script>
+        </t>
+    </template>
+</odoo>
